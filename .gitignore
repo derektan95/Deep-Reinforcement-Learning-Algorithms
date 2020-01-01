@@ -102,3 +102,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# IGNORE ALL TENSORBOARD RUN FILES
+runs/
+checkpoint_actor/
+checkpoint_critic/
