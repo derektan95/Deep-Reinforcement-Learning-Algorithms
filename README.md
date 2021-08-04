@@ -68,6 +68,11 @@ The labs and projects can be found below.  All of the projects use rich simulati
 
 To set up your python environment to run the code in this repository, follow the instructions below.
 
+0. Install Conda via Command Line
+Anaconda is a distribution of Python that aims to simplify package management and deployment. The main use for Anaconda in this repository would be the creation of an isolated environment to install your deep learning packages and dependencies into.
+    - [Youtube Guide for MAC](https://www.youtube.com/watch?v=oWVTO_69U4c&t=35s)
+	- [Official Guide](https://docs.anaconda.com/anaconda/install/mac-os/)
+
 1. Create (and activate) a new environment with Python 3.6.
 
 	- __Linux__ or __Mac__: 
