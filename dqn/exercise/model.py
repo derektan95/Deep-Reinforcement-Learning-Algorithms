@@ -16,8 +16,11 @@ class QNetwork(nn.Module):
             fc1_units (int): Number of nodes in first hidden layer
             fc2_units (int): Number of nodes in second hidden layer
         """
-#         super(QNetwork, self).__init__()
-        super().__init__()
+        # Needed to inherit functionalities from nn.Module
+        # super(QNetwork, self).__init__()
+        super().__init__()    
+        
+        # Defining the layers of NN
         self.seed = torch.manual_seed(seed)
         self.fc1 = nn.Linear(state_size, fc1_units)
         self.fc2 = nn.Linear(fc1_units, fc2_units)
@@ -31,7 +34,7 @@ class QNetwork(nn.Module):
     
 
     
-    
+####### ALTERNATIVE NETWORK #######
 #     def __init__(self, state_size, action_size, seed):
 #         """Initialize parameters and build model.
 #         Params
