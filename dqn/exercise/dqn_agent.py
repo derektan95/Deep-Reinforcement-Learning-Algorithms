@@ -87,6 +87,20 @@ class Agent():
 
         ## TODO: compute and minimize the loss
         "*** YOUR CODE HERE ***"
+        
+        # Target actions from stable Fixed Target-Q Neural Network
+        Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
+        Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))   # If done, ignore next action
+        
+        # Current actions from Q-Approximator Neural Network
+        Q_expecteds_arr = self.qnetwork_local(states)
+        Q_expecteds = Q_expecteds_arr[torch.arange(Q_expecteds_arr.shape[0]).long(), actions.squeeze().long()].unsqueeze(1)
+        
+        # Compute & minimize the loss
+        loss = F.mse_loss(Q_expecteds, Q_targets)
+        self.optimizer.zero_grad()          # Zero out all of the gradients for the variables which the optimizer will update
+        loss.backward()                     # Compute the gradient of the loss wrt each parameter of the model.
+        self.optimizer.step()               # Actually update the parameters of the model using the gradients computed by the backwards pass.
 
         # ------------------- update target network ------------------- #
         self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)                     
