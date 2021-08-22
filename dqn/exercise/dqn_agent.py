@@ -89,7 +89,8 @@ class Agent():
         "*** YOUR CODE HERE ***"
         
         # Target actions from stable Fixed Target-Q Neural Network
-        Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)
+        # Detach since no need to update weights & biases param in Target Network - They are cloned from qnetwork_local
+        Q_targets_next = self.qnetwork_target(next_states).detach().max(1)[0].unsqueeze(1)   
         Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))   # If done, ignore next action
         
         # Current actions from Q-Approximator Neural Network
