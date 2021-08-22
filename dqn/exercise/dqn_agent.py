@@ -66,7 +66,7 @@ class Agent():
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
         self.qnetwork_local.eval()
         with torch.no_grad():
-            action_values = self.qnetwork_local(state)
+            action_values = self.qnetwork_local(state)       # INFERENCE: NO NEED TO UPDATE WEIGHTS / BIASES VIA BACKPROP
         self.qnetwork_local.train()
 
         # Epsilon-greedy action selection
