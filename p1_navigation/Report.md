@@ -48,9 +48,30 @@ However, since weight parameters are continuously updated to improve our Neural 
 
 <img src="media/dqn_fixed_q_target.PNG" width="900" height="300" />
 
+In summary, the Pseudo-code of Deep Q-Learning would look like this: 
+
+<img src="media/dqn_improved_pseudo_code.PNG" width="900" height="300" />
+
+
 ### Results
 The results below is obtained from my implementation of Deep Q-Learning for this project. As you can see, training stabilizes early around 800 episodes. 
 
 <img src="media/score_vs_episodes_dqn.PNG" width="900" height="300" />
 
 
+### Ideas for Future Work
+There are 2 possible improvements that could be made to the Deep Q-Learning algorithm. 
+
+#### Double DQN
+The values in the Q-table are still evolving depending on how much it has been visited. Especially in the early episodes, the highest Q value may not correlate to the best action
+to be chosen. Hence, our current approach often overestimate the Q-value since we are always picking the maximum Q-value among a set of noisy Q-values, leading to training instability.
+
+To fix this, we can have a separate set of neural network weights parameters to 'check' with the original set of parameters in the Policy Evaluation step. In other words, both set of function approximators with different weight parameters must agree with each other in order to achieve an overall high Q-value. Conveniently, we can use the frozen target-Q network as the 2nd network. For more information, please refer to this [Research Paper](https://arxiv.org/abs/1509.06461). 
+
+<img src="media/double_dqn.PNG" width="900" height="300" />
+
+
+#### Prioritized Experience Replay
+There are some experiences in the replay bugger that are considered to be more important than the other. This happens when the Temporal-Difference Error in the Policy Evaluation step gives us a larger difference between the target-Q network and our current local network, implying that there is still alot of learning to be done. We can therefore save such experiences in the replay buffer along with a **priority parameter** encoded in the form of a probability value. The overall modifications that have to be made can be seen in the image below. For more information, please refer to this [Research Paper](https://arxiv.org/abs/1511.05952). 
+
+<img src="media/prioritized_experience_replay.PNG" width="900" height="300" />
