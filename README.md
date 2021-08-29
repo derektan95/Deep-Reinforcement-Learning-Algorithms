@@ -70,8 +70,8 @@ To set up your python environment to run the code in this repository, follow the
 
 0. Install Conda via Command Line
 Anaconda is a distribution of Python that aims to simplify package management and deployment. The main use for Anaconda in this repository would be the creation of an isolated environment to install your deep learning packages and dependencies into.
+	- [Official Guide](https://docs.anaconda.com/anaconda/install)
     - [Youtube Guide for MAC](https://www.youtube.com/watch?v=oWVTO_69U4c&t=35s)
-	- [Official Guide](https://docs.anaconda.com/anaconda/install/mac-os/)
 
 1. Create (and activate) a new environment with Python 3.6.
 
@@ -87,14 +87,14 @@ Anaconda is a distribution of Python that aims to simplify package management an
 	```
 	
 2. Follow the instructions in [this repository](https://github.com/openai/gym) to perform a minimal install of OpenAI gym.  
-	- Next, install the **classic control** environment group by following the instructions [here](https://github.com/openai/gym#classic-control).
-	- Then, install the **box2d** environment group by following the instructions [here](https://github.com/openai/gym#box2d).
+	- Next, install the **classic control** environment group by following the instructions [here](https://github.com/openai/gym#classic-control) using `pip install gym[classic_control]`.
+	- Then, install the **box2d** environment group by following the instructions [here](https://github.com/openai/gym#box2d) using `pip install gym[box2d]`.
 	
 3. Clone the repository (if you haven't already!), and navigate to the `python/` folder.  Then, install several dependencies.
 ```bash
 git clone https://github.com/udacity/deep-reinforcement-learning.git
 cd deep-reinforcement-learning/python
-pip install .
+pip install .  # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch
 ```
 
 4. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
