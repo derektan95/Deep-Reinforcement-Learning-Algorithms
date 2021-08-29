@@ -1,10 +1,10 @@
 # Project 1 Report: Deep Q-Learning for Robot Navigation
 
 ## Summary of Content
-- [Deep Q-Learning Description](learning-algorithm)
-- [Hyperparameters Chosen](hyperparameters-chosen)
-- [Results](results)
-- [Ideas for Future Work](ideas-for-future-work)
+- [Deep Q-Learning Description](#learning-algorithm)
+- [Hyperparameters Chosen](#hyperparameters-chosen)
+- [Results](#results)
+- [Ideas for Future Work](#ideas-for-future-work)
 
 ## Learning Algorithm 
 The key learning algorithm used in this project is Deep Q-Learing. We have to first gain a deeper understanding of conventional Reinforcement Learning algorithms before we can better appreciate the use of Deep Q-Learning in solving our robot navigation task. 
