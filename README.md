@@ -89,24 +89,25 @@ Anaconda is a distribution of Python that aims to simplify package management an
 2. Follow the instructions in [this repository](https://github.com/openai/gym) to perform a minimal install of OpenAI gym.  
 	- Next, install the **classic control** environment group by following the instructions [here](https://github.com/openai/gym#classic-control) using `pip install gym[classic_control]`.
 	- Then, install the **box2d** environment group by following the instructions [here](https://github.com/openai/gym#box2d) using `pip install gym[box2d]`.
-	
-3. Clone the repository (if you haven't already!), and navigate to the `python/` folder.  Then, install several dependencies.
+
+3. If you would like to run your projects with CUDA GPU, you can install relevant CUDA & pytorch packages via [the instructions here](https://pytorch.org/get-started/locally/). **You can verify if CUDA is used by PyTorch by running `torch.cuda.is_available()` in your python script.**
+
+4. Clone the repository (if you haven't already!), and navigate to the `python/` folder.  Then, install several dependencies.
 ```bash
 git clone https://github.com/udacity/deep-reinforcement-learning.git
 cd deep-reinforcement-learning/python
 pip install .  # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
 ```
 
-4. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
+5. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
 ```bash
 python -m ipykernel install --user --name drlnd --display-name "drlnd"
 ```
 
-5. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu. <br>
+6. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu. <br>
 
-6. If you would like to run your projects with CUDA GPU, you can install relevant CUDA & pytorch packages via [the instructions here](https://pytorch.org/get-started/locally/)
 
-**NOTE:** You may notice that code cells may not execute as expected (E.g. Hangs for no reason). Ensure that anaconda is at the latest version (`conda install conda && conda install anaconda`) + using compatible version of pytorch (`conda install torch`).
+**NOTE:** You may notice that code cells may not execute as expected (E.g. Hangs for no reason). Please check `python/requirements.txt` to ensure that the appropriate tensorflow & pytorch packages are installed.
 
 ![Kernel][image2]
 
