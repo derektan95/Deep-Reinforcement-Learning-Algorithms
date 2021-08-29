@@ -79,10 +79,16 @@ In summary, the Pseudo-code of Deep Q-Learning would look like this:
 ### Hyperparameters Chosen
 1) **Neural Network Model:** Linear (64) - ReLU - Linear(64) - ReLU - Linear (4)
 2) **Episodes:** 1800
-3) **Max Duration:** 1000 timesteps
-4) **Epsilon (Start):** 1.0
-5) **Epsilon (End):** 0.01
-6) **Epsilon Decay Rate:** 0.995
+3) **Max Duration:** 1000 timesteps          # Max Timesteps per Episode
+4) **Epsilon (Start):** 1.0                  # Start value for eps-greedy policy
+5) **Epsilon (End):** 0.01                   # End value for eps-greedy policy
+6) **Epsilon Decay Rate:** 0.995             # Rate at which eps decays (I.e. more exploitive)
+7) **Replay Buffer Size (Max)**: 1e5         # Max Replay Buffer Size
+8) **Batch Size**: 64                        # Batch Size to sample and learn from 
+9) **Discount Factor (Gamma)**: 0.99         # To compute expected cumulative rewards
+10) **Tau**: 1e-3                            # For soft update of target network parameters
+11) **Learning Rate**: 5e-4                  # Rate parameters changed by optimizer
+12) **Update Every**:                        # Number of episodes before learning occurs
 
 
 ### Results
