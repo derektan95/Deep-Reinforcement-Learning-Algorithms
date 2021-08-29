@@ -79,14 +79,20 @@ In summary, the Pseudo-code of Deep Q-Learning would look like this:
 ### Hyperparameters Chosen
 1) **Neural Network Model:** Linear (64) - ReLU - Linear(64) - ReLU - Linear (4)
 2) **Episodes:** 1800
-3) **Max Duration:** 1000 timesteps
-4) **Epsilon (Start):** 1.0
-5) **Epsilon (End):** 0.01
-6) **Epsilon Decay Rate:** 0.995
+3) **Max Duration:** 1000 timesteps  &nbsp;  
+4) **Epsilon (Start):** 1.0                 
+5) **Epsilon (End):** 0.01                   
+6) **Epsilon Decay Rate:** 0.995            
+7) **Replay Buffer Size (Max)**: 1e5         
+8) **Buffer Batch Size (Sample)**: 64        
+9) **Discount Factor (Gamma)**: 0.99        
+10) **Target Param Update Rate (Tau)**: 1e-3        
+11) **Learning Rate (Optimizer)**: 5e-4       
+12) **Update Every (Learning)**: 4
 
 
 ### Results
-The results below is obtained from my implementation of Deep Q-Learning for this project. As you can see, training stabilizes early around 800 episodes. 
+The results below is obtained from my implementation of Deep Q-Learning for this project. As you can see, training stabilizes early around 800 episodes. Training achieves a **score higher than +13 after 465 episodes** (verify on [notebook](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p1_navigation/Navigation.ipynb)).
 
 <p align="center">
   <img src="media/score_vs_episodes_dqn.PNG" width="500" height="300" />
