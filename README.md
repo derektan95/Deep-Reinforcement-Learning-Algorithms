@@ -94,7 +94,7 @@ Anaconda is a distribution of Python that aims to simplify package management an
 ```bash
 git clone https://github.com/udacity/deep-reinforcement-learning.git
 cd deep-reinforcement-learning/python
-pip install .  # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch
+pip install .  # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
 ```
 
 4. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
@@ -102,7 +102,11 @@ pip install .  # NOTE: You may need to comment out pytorch version 0.4.0 in requ
 python -m ipykernel install --user --name drlnd --display-name "drlnd"
 ```
 
-5. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu. 
+5. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu. <br>
+
+6. If you would like to run your projects with CUDA GPU, you can install relevant CUDA & pytorch packages via [the instructions here](https://pytorch.org/get-started/locally/)
+
+**NOTE:** You may notice that code cells may not execute as expected (E.g. Hangs for no reason). Ensure that anaconda is at the latest version (`conda install conda && conda install anaconda`) + using compatible version of pytorch (`conda install torch`).
 
 ![Kernel][image2]
 

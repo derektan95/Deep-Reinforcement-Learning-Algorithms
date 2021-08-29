@@ -8,7 +8,7 @@ docopt
 pyyaml
 protobuf==3.5.2
 grpcio==1.11.0
-#torch==0.4.0   # WINDOWS: Install using pip install torch instead if error persists
+#torch==0.4.0   # # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using `pip install torch` to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
 pandas
 scipy
 ipykernel
