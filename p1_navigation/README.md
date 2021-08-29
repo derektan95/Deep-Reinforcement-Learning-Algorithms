@@ -34,6 +34,8 @@ The task is episodic, and in order to solve the environment, your agent must get
 
 2. Place the file in the DRLND GitHub repository, in the `p1_navigation/` folder, and unzip (or decompress) the file. 
 
+3. For more specific instructions on how to setup your Anaconda Python environment, please refer to the README.md at the [root of this repository](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree).
+
 ### Instructions
 
 Follow the instructions in `Navigation.ipynb` to get started with training your own agent!  
