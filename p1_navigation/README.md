@@ -7,7 +7,7 @@
 ### Introduction
 
 For this project, you will train an agent to navigate (and collect bananas!) in a large, square world. <br>
-**Implementation details and results can be found in [Report.md](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/edit/dev/p1-dqn-navigation/p1_navigation/Report.md).**
+**Implementation details and results can be found in [Report.md](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p1_navigation/Report.md).**
 
 ![Trained Agent][image1]
 
