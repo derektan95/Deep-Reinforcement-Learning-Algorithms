@@ -92,7 +92,7 @@ In summary, the Pseudo-code of Deep Q-Learning would look like this:
 
 
 ### Results
-The results below is obtained from my implementation of Deep Q-Learning for this project. As you can see, training stabilizes early around 800 episodes. 
+The results below is obtained from my implementation of Deep Q-Learning for this project. As you can see, training stabilizes early around 800 episodes. Training achieves a **score higher than +13 after 465 episodes** (verify on [notebook](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p1_navigation/Navigation.ipynb)).
 
 <p align="center">
   <img src="media/score_vs_episodes_dqn.PNG" width="500" height="300" />
