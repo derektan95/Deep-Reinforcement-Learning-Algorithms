@@ -182,7 +182,7 @@ def surrogate(policy, old_probs, states, actions, rewards,
     new_probs = torch.where(actions == RIGHT, new_probs, 1.0-new_probs)
 
     # Numerically, new_probs = old_probs. But, old_probs are detached from computational graph in 'collect_trajectory' method, while new_probs isn't. 
-    # This ensures that loss.backward() only backpropogate with respect to the numerator. (Though ALWAYS ration = 1).
+    # This ensures that loss.backward() only backpropogate with respect to the numerator. (Though ALWAYS ratio = 1).
     ratio = new_probs/old_probs   
 
     # include a regularization term
