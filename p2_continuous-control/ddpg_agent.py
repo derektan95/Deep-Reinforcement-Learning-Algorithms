@@ -9,14 +9,15 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = int(1e5)  # replay buffer size
+BUFFER_SIZE = int(1e6)  # replay buffer size
 BATCH_SIZE = 128        # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor 
-LR_CRITIC = 1e-3        # learning rate of the critic
-WEIGHT_DECAY = 0        # L2 weight decay
-UPDATE_EVERY = 4        # how often to update the network
+LR_CRITIC = 3e-4        # learning rate of the critic
+WEIGHT_DECAY = 0        # L2 weight decay          (ORIGINAL: 0)
+LEARN_EVERY = 1                 # how often for local networks to learn
+SOFT_WEIGHTS_UPDATE_EVERY = 20    # how often to copy weights over to target networks
 
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -53,6 +54,25 @@ class Agent():
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, random_seed)
         self.t_step = 0
+        self.learn_step = 0
+        
+        ## Print networks
+        print("actor_local", self.actor_local)
+        print("actor_target", self.actor_target)
+        print("critic_local", self.critic_local)
+        print("critic_target", self.critic_target)
+        
+        # Print Hyper-parameters
+        print("BUFFER_SIZE: ", BUFFER_SIZE)
+        print("BATCH_SIZE: ", BATCH_SIZE)
+        print("GAMMA: ", GAMMA)
+        print("TAU: ", TAU)
+        print("LR_ACTOR: ", LR_ACTOR)
+        print("LR_CRITIC: ", LR_CRITIC)
+        print("WEIGHT_DECAY: ", WEIGHT_DECAY)
+        print("LEARN_EVERY: ", LEARN_EVERY)
+        print("SOFT_WEIGHTS_UPDATE_EVERY: ", SOFT_WEIGHTS_UPDATE_EVERY)
+
     
     def step(self, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
@@ -60,13 +80,15 @@ class Agent():
         self.memory.add(state, action, reward, next_state, done)
 
         # Learn every UPDATE_EVERY time steps.
-        self.t_step = (self.t_step + 1) % UPDATE_EVERY        
+        self.t_step = (self.t_step + 1) % LEARN_EVERY        
         if self.t_step == 0:
             # Learn, if enough samples are available in memory
             if len(self.memory) > BATCH_SIZE:
+#                 print("LEARNING, self.t_step: ", self.t_step)
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
 
+                
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
         state = torch.from_numpy(state).float().to(device)
@@ -119,8 +141,13 @@ class Agent():
         self.actor_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
-        self.soft_update(self.critic_local, self.critic_target, TAU)
-        self.soft_update(self.actor_local, self.actor_target, TAU)                     
+        # Learn every UPDATE_EVERY time steps.
+        self.learn_step = (self.learn_step + 1) % SOFT_WEIGHTS_UPDATE_EVERY  
+#         print("SOFT COPYING WEIGHTS, self.learn_step: ", self.learn_step)
+        
+        if self.learn_step == 0:
+            self.soft_update(self.critic_local, self.critic_target, TAU)
+            self.soft_update(self.actor_local, self.actor_target, TAU)                     
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
