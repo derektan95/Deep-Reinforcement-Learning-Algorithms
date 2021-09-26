@@ -14,7 +14,7 @@ BATCH_SIZE = 128        # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor 
-LR_CRITIC = 3e-4        # learning rate of the critic
+LR_CRITIC = 4e-4        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay          (ORIGINAL: 0)
 LEARN_EVERY = 1                 # how often for local networks to learn
 SOFT_WEIGHTS_UPDATE_EVERY = 20    # how often to copy weights over to target networks
@@ -180,7 +180,8 @@ class OUNoise:
     def sample(self):
         """Update internal state and return it as a noise sample."""
         x = self.state
-        dx = self.theta * (self.mu - x) + self.sigma * np.array([random.random() for i in range(len(x))])
+#         dx = self.theta * (self.mu - x) + self.sigma * np.array([random.random() for i in range(len(x))])
+        dx = self.theta*(self.mu - x) + self.sigma*np.random.standard_normal(len(x))   # The more proper way to simulate noise
         self.state = x + dx
         return self.state
 

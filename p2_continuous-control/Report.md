@@ -46,6 +46,9 @@ A unique feature of DDPG is the way the target network weights are updated. Conv
   <img src="media/ddpg_network_weights_soft_update.png" width="650" height="300" />
 </p>
 
+### Ornstein-Uhlenbeck (OU) Process Noise
+Additional OU noise is added to action outputs from the policy-based actor network. OU noise is modelled after a gaussian distribution. Studies have shown that adding such noise improves training convergence rate. 
+
 <br>
 
 
@@ -59,18 +62,18 @@ A unique feature of DDPG is the way the target network weights are updated. Conv
 7) **Discount Factor (Gamma)**: 0.99        
 8) **Target Param Update Rate (Tau)**: 1e-3        
 9) **Actor Learning Rate (ADAM Optimizer)**: 1e-4
-10) **Critic Learning Rate (ADAM Optimizer)**: 3e-4       
+10) **Critic Learning Rate (ADAM Optimizer)**: 4e-4       
 11) **Learn Every**: 1
 12) **Soft Weights Update Every**: 20
 
 
 ### Results
-The results below is obtained from my implementation of DDPG for this project. As you can see, training stabilizes early around 3000 episodes. Training achieves a **score higher than +13 after 532 episodes (Average between 432-532)** (verify on [notebook](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p1_navigation/Navigation.ipynb)). 
+The results below is obtained from my implementation of DDPG for this project (Version 1). Training achieves an **average reward (over 100 episodes) of higher than +30 after 1000 episodes (Average between 900-1000)** (verify on [notebook](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p2_continuous-control/Continuous_Control.ipynb)). 
 
 The 2 main hyper-parameters that made most impact on the training progress is the network **hidden layer size** and the **Soft Weights Update Every** parameter. Too many weight parameters in the hidden layers can cause difficulties in training the networks, while having too little weight parameters would result in sub-par performance due to its inability to represent and manipulate the state / action space inputs. Setting the `Soft Weights Update Every` parameter to an adequately high value ensures that the target network is only gradually updated, leading to more training stability.
 
 <p align="center">
-  <img src="media/score_vs_episodes_dqn.png" width="500" height="300" />
+  <img src="media/ddpg_reward_episode_graph.png" width="500" height="300" />
 </p>
 
 
