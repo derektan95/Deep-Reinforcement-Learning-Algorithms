@@ -6,6 +6,12 @@
 
 # Project 2: Continuous Control
 
+### NOTE
+I have **personally attempted version 1** of this project, and have achieved an average score of +30 over 100 consecutive episodes. I have decided to leave the instructions for version 2 here for future attempts. Please refer to [the report](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p2_continuous-control/Report.md) for more specific details on my implementation.
+
+### Dependencies
+You may refer to the [Dependencies](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree) section here for instructions on how to setup your project and to install relevant dependencies. 
+
 ### Introduction
 
 For this project, you will work with the [Reacher](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#reacher) environment.
