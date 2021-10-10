@@ -1,4 +1,4 @@
-# Project 2 Report: Deep Deterministic Policy Gradients (DDPG) for Robot Arm Continuous Control
+# Project 3 Report: Multi-Agent Deep Deterministic Policy Gradients (MADDPG) For Cooperative Tennis Game
 
 ## Summary of Content
 - [MADDPG Description](#learning-algorithm)
@@ -18,29 +18,25 @@ Traditional reinforcement learning approaches such as Q-Learning or policy gradi
 This approach is an extension to the actor-critic policy gradient method, where the critic is augmented with extra information about the policies of all other agents. Each agent maintains their own policy network, which outputs an action with local information as input. This functions similarly to the DDPG algorithm, with the exception that the central critic network has previliged access to other agents' actions during training. As a result, **training is stabilized**. An overview of this multi-agent approach can be seen below. 
 
 <p align="center">
-  <img src="media/maddpg_decentralized_policy.png" width="650" height="300" />
+  <img src="media/maddpg_decentralized_policy.png" width="450" height="300" />
 </p>
 
 The pseudo-code of this approach can be seen below: 
 
 <p align="center">
-  <img src="media/maddpg_decentralized_policy_pseudocode.png" width="650" height="300" />
+  <img src="media/maddpg_decentralized_policy_pseudocode.png" width="600" height="500" />
 </p>
 
 Similar to DDPG, MADDPG is about training the local critic network to better estimate the true Q value of a (State, Action) pair given by all agents' policy networks. Concurrently, the local actor network is trained to provide better actions that leads to higher Q value given by the critic network. An illustration of the MADDPG training can be seen below. More information on this approach can be found [here](https://arxiv.org/pdf/1706.02275.pdf).
 
 <p align="center">
-  <img src="media/maddpg_critic_training_decentralized_policy.png" width="650" height="300" />
-  <img src="media/maddpg_policy_training_decentralized_policy.png" width="650" height="300" />
+  <img src="media/maddpg_critic_training_decentralized_policy.png" width="650" height="500" />
+  <img src="media/maddpg_policy_training_decentralized_policy.png" width="650" height="400" />
 </p>
 
 
 ### Training via Self-Play
 Converse to the previous approach, the same actor and critic networks are used by agents trained via self-play. In the case of MADDPG, each agent would input their own state into the same policy network to output their respective actions. These experience tuples are stored into the same experience replay buffer, which are later sampled upon during their individual training. Each agent seeks to maximize its own rewards, and can therefore be adapted to cooperative or competitive scenarios. The main gist of this approach is adapted from the AlphaZero self-play paper [here](https://arxiv.org/pdf/1712.01815.pdf). 
-
-<p align="center">
-  <img src="media/ddpg_network_training_first_output.png" width="650" height="300" />
-</p>
 
 
 <br>
@@ -67,7 +63,7 @@ The results below is obtained from my implementation of MADDPG via self-play for
 The main hyper-parameter that made most impact on the training progress is the network **hidden layer size** . Too many weight parameters in the hidden layers can cause difficulties in training the networks, while having too little weight parameters would result in sub-par performance due to its inability to represent and manipulate the state / action space inputs. After some experimentation, it can be concluded that a simple 2-layer network with 64 layer size each works well for this scenario.
 
 <p align="center">
-  <img src="media/training_score_maddpg_self_play.png" width="500" height="300" />
+  <img src="media/training_score_maddpg_self_play.png" width="800" height="480" />
 </p>
 
 
