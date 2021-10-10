@@ -6,6 +6,12 @@
 
 # Project 3: Collaboration and Competition
 
+### NOTE
+Please refer to [the report](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/Report.md) for more specific details on my implementation.
+
+### Dependencies
+You may refer to the [Dependencies](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree) section here for instructions on how to setup your project and to install relevant dependencies. 
+
 ### Introduction
 
 For this project, you will work with the [Tennis](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#tennis) environment.
