@@ -28,13 +28,13 @@ Actor-Critic Methods is a class of algorithms that combines both policy-based an
 Deep Deterministic Policy Gradient (DDPG) Networks is similar to Actor-Critic methods in that they maintain both a policy-based network (Actor) and a value-based network (Critic). The actor network is deterministic; it takes in the state of the environment and outputs a single action that it believes would yield the highest rewards. 
 
 <p align="center">
-  <img src="media/ddpg_network_training_first_output.png" width="650" height="300" />
+  <img src="media/ddpg_network_training_first_output.png" width="600" height="300" />
 </p>
 
 This action is passed on to the critic network, which concurrently takes in the state of the environment to output a Q-value corresponding to the state-action pair. Here, the critic network is trained using a temporal difference bootstrapping step. The Q-value is then used as a baseline to train the actor network, where backpropogation is performed to maximize this Q-value. More information about DDPG can be found [here](https://arxiv.org/abs/1509.02971).
 
 <p align="center">
-  <img src="media/ddpg_network_training.png" width="650" height="300" />
+  <img src="media/ddpg_network_training.png" width="550" height="300" />
 </p>
 
 
@@ -42,7 +42,7 @@ This action is passed on to the critic network, which concurrently takes in the 
 Like many other DRL algorithms, DDPG utilizes an experience replay buffer to store experience tuples for training at a later stage. This breaks correlations between consequetive experience tuples and leads to more stable training.  
 
 <p align="center">
-  <img src="media/replay_buffer_conventional.png" width="650" height="300" />
+  <img src="media/replay_buffer_conventional.png" width="550" height="300" />
 </p>
 
 ### DDPG Network Weights Update
@@ -90,12 +90,12 @@ There are 2 possible improvements that could be made to the DDPG algorithm.
 It is difficult to deterine how many bootstrapping steps should be used. The larger the number of steps, the lower the bias and the higher the variance. In practice, we can compute a weighted average of returns G across all possible bootstrapping steps. This works similarly to the discount factor we used in value-based methods. More information about DDPG can be found [here](https://arxiv.org/abs/1506.02438).
 
 <p align="center">
-  <img src="media/generalized_advantage_function_bootstrapping.png" width="650" height="230" />
+  <img src="media/generalized_advantage_function_bootstrapping.png" width="550" height="230" />
 </p>
 
 #### Synchronous Training
 A multi-agent setup can be used instead of using a regular experience replay buffer to break corelations during training. Each network waits for all agents to complete a segment of their interaction with their environments, have their results synced and used to collectively update the both the actor and critic networks. The updated weights are then copied back to each agent for subsequent interactions with their environments. 
 
 <p align="center">
-  <img src="media/a2c_replay_buffer.png" width="650" height="300" />
+  <img src="media/a2c_replay_buffer.png" width="550" height="300" />
 </p>
