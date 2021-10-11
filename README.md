@@ -28,7 +28,7 @@ The main principles taught in this segment are:
 2) Writing ROS nodes & communication models (Publisher-Subscriber, Service-Client) -->
 
 <p align="center">
-  <img src="p1_navigation/media/p1_dqn_navigation_trained_agent_raw_Trimmed.gif" width="500" height="300" />
+  <img src="p1_navigation/media/p1_dqn_navigation_trained_agent_raw_Trimmed.gif" width="400" height="300" />
   <img src="p1_navigation/media/score_vs_episodes_dqn.PNG" width="450" height="300" />
 </p>
 
@@ -40,11 +40,11 @@ The main principles taught in this segment are:
 2) Adaptive Monte Carlos Localization (Particle Filter) -->
 
 <p align="center">
-  <img src="p2_continuous-control/media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="500" height="300" />
+  <img src="p2_continuous-control/media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="400" height="300" />
   <img src="p2_continuous-control/media/ddpg_reward_episode_graph.png" width="450" height="300" />
 </p>
 
-## Multi-Agent Deep Deterministi Policy Gradient (MADDPG) for Cooperative Tennis Game <br/>
+## Multi-Agent Deep Deterministic Policy Gradient (MADDPG) for Cooperative Tennis Game <br/>
 <!-- A common mapping algorithm is the **Occupancy Grid Mapping**. Using sensor measurements and the Binary Bayes Filter, it computes the likelihood of an obstacle (i.e. map) given a particular grid on the map. Mapping requires the knowledge of the robot's start position, motor controls and sensor readings.
 
 **Simulataneous Localization and Mapping (SLAM)** combines principles from both localization and mapping. Using sensor readings and motor control, the robot can continuously map the surroundings, and use the map data to localize itself relative to it. The **Online SLAM approach** gives the map and robot's pose at a given point of time, while the **Full SLAM approach** gives the map and all past robot poses. The main techniques taught in this class is the **Grid-Based FastSLAM** and **GraphSLAM**, which are Online Slam and Full Slam approaches respectively. In this project, the **Real Time Appearance Based Mapping** is used as part of the Online SLAM approach, where a depth camera is used. It provides **3D localization and mapping**, with the ability to perform **loop closure** (i.e. identify previously visited locations to allow for smoother map generation). 
@@ -58,6 +58,6 @@ The main principles taught in this segment are:
 4) RTAB-map SLAM (Variant of GraphSLAM) -->
 
 <p align="center">
-  <img src="p3_collab-compet/media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="500" height="300 />
+  <img src="p3_collab-compet/media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="400" height="300" />
   <img src="p3_collab-compet/media/training_score_maddpg_self_play.png" width="450" height="300" />
 </p>
