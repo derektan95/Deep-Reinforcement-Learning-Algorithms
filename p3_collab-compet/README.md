@@ -1,7 +1,7 @@
 # Project 3 Report: Multi-Agent Deep Deterministic Policy Gradient (MADDPG) For Cooperative Tennis Game
 
 <p align="center">
-  <img src="../media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="900" height="400" />
+  <img src="media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="700" height="400" />
 </p>
 
 **Note:** Please refer to the instructions on how to install this project [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/INSTRUCTIONS.md).
@@ -69,7 +69,7 @@ The results below is obtained from my implementation of MADDPG via self-play for
 The main hyper-parameter that made most impact on the training progress is the network **hidden layer size** . Too many weight parameters in the hidden layers can cause difficulties in training the networks, while having too little weight parameters would result in sub-par performance due to its inability to represent and manipulate the state / action space inputs. After some experimentation, it can be concluded that a simple 2-layer network with 64 layer size each works well for this scenario.
 
 <p align="center">
-  <img src="media/training_score_maddpg_self_play.png" width="800" height="480" />
+  <img src="media/training_score_maddpg_self_play.png" width="500" height="300" />
 </p>
 
 
