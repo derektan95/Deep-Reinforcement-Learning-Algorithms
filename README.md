@@ -1,120 +1,63 @@
-[//]: # (Image References)
+# Deep Reinforcement Learning Nanodegree (Udacity)
 
-[image1]: https://user-images.githubusercontent.com/10624937/42135602-b0335606-7d12-11e8-8689-dd1cf9fa11a9.gif "Trained Agents"
-[image2]: https://user-images.githubusercontent.com/10624937/42386929-76f671f0-8106-11e8-9376-f17da2ae852e.png "Kernel"
+**Disclaimer:** Udacity provided some starter code, but the implementation for these concepts are done by myself. Please contact derektan95@hotmail.com for any questions. 
 
-# Deep Reinforcement Learning Nanodegree
+### Certificate of Completion<br/>
+https://confirm.udacity.com/XLGDCKNX
 
-![Trained Agents][image1]
+### Summary<br/>
+<!-- This course aims to educate more about localization and navigation principles pertaining to autonomous robots, using a commonly used platform called Robot Operating System (ROS). It covers topics ranging from Gazebo simulation, communcation between ROS nodes, localization using Extended Kalman Filter or Particle Filter, Simultaneous Localization & Mapping (SLAM) and A* Path Planning. All of these techniques culminates to a final project where a home service robot capable of localization and navigation is developed. Instructions for compiling each project is available on each project's subdirectory. -->
 
-This repository contains material related to Udacity's [Deep Reinforcement Learning Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893) program.  
-
-## Table of Contents
-
-### Tutorials
-
-The tutorials lead you through implementing various algorithms in reinforcement learning.  All of the code is in PyTorch (v0.4) and Python 3.
-
-* [Dynamic Programming](https://github.com/udacity/deep-reinforcement-learning/tree/master/dynamic-programming): Implement Dynamic Programming algorithms such as Policy Evaluation, Policy Improvement, Policy Iteration, and Value Iteration. 
-* [Monte Carlo](https://github.com/udacity/deep-reinforcement-learning/tree/master/monte-carlo): Implement Monte Carlo methods for prediction and control. 
-* [Temporal-Difference](https://github.com/udacity/deep-reinforcement-learning/tree/master/temporal-difference): Implement Temporal-Difference methods such as Sarsa, Q-Learning, and Expected Sarsa. 
-* [Discretization](https://github.com/udacity/deep-reinforcement-learning/tree/master/discretization): Learn how to discretize continuous state spaces, and solve the Mountain Car environment.
-* [Tile Coding](https://github.com/udacity/deep-reinforcement-learning/tree/master/tile-coding): Implement a method for discretizing continuous state spaces that enables better generalization.
-* [Deep Q-Network](https://github.com/udacity/deep-reinforcement-learning/tree/master/dqn): Explore how to use a Deep Q-Network (DQN) to navigate a space vehicle without crashing.
-* [Robotics](https://github.com/dusty-nv/jetson-reinforcement): Use a C++ API to train reinforcement learning agents from virtual robotic simulation in 3D. (_External link_)
-* [Hill Climbing](https://github.com/udacity/deep-reinforcement-learning/tree/master/hill-climbing): Use hill climbing with adaptive noise scaling to balance a pole on a moving cart.
-* [Cross-Entropy Method](https://github.com/udacity/deep-reinforcement-learning/tree/master/cross-entropy): Use the cross-entropy method to train a car to navigate a steep hill.
-* [REINFORCE](https://github.com/udacity/deep-reinforcement-learning/tree/master/reinforce): Learn how to use Monte Carlo Policy Gradients to solve a classic control task.
-* **Proximal Policy Optimization**: Explore how to use Proximal Policy Optimization (PPO) to solve a classic reinforcement learning task. (_Coming soon!_)
-* **Deep Deterministic Policy Gradients**: Explore how to use Deep Deterministic Policy Gradients (DDPG) with OpenAI Gym environments.
-  * [Pendulum](https://github.com/udacity/deep-reinforcement-learning/tree/master/ddpg-pendulum): Use OpenAI Gym's Pendulum environment.
-  * [BipedalWalker](https://github.com/udacity/deep-reinforcement-learning/tree/master/ddpg-bipedal): Use OpenAI Gym's BipedalWalker environment.
-* [Finance](https://github.com/udacity/deep-reinforcement-learning/tree/master/finance): Train an agent to discover optimal trading strategies.
-
-### Labs / Projects
-
-The labs and projects can be found below.  All of the projects use rich simulation environments from [Unity ML-Agents](https://github.com/Unity-Technologies/ml-agents). In the [Deep Reinforcement Learning Nanodegree](https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893) program, you will receive a review of your project.  These reviews are meant to give you personalized feedback and to tell you what can be improved in your code.
-
-* [The Taxi Problem](https://github.com/udacity/deep-reinforcement-learning/tree/master/lab-taxi): In this lab, you will train a taxi to pick up and drop off passengers.
-* [Navigation](https://github.com/udacity/deep-reinforcement-learning/tree/master/p1_navigation): In the first project, you will train an agent to collect yellow bananas while avoiding blue bananas.
-* [Continuous Control](https://github.com/udacity/deep-reinforcement-learning/tree/master/p2_continuous-control): In the second project, you will train an robotic arm to reach target locations.
-* [Collaboration and Competition](https://github.com/udacity/deep-reinforcement-learning/tree/master/p3_collab-compet): In the third project, you will train a pair of agents to play tennis! 
-
-### Resources
-
-* [Cheatsheet](https://github.com/udacity/deep-reinforcement-learning/blob/master/cheatsheet): You are encouraged to use [this PDF file](https://github.com/udacity/deep-reinforcement-learning/blob/master/cheatsheet/cheatsheet.pdf) to guide your study of reinforcement learning. 
-
-## OpenAI Gym Benchmarks
-
-### Classic Control
-- `Acrobot-v1` with [Tile Coding](https://github.com/udacity/deep-reinforcement-learning/blob/master/tile-coding/Tile_Coding_Solution.ipynb) and Q-Learning  
-- `Cartpole-v0` with [Hill Climbing](https://github.com/udacity/deep-reinforcement-learning/blob/master/hill-climbing/Hill_Climbing.ipynb) | solved in 13 episodes
-- `Cartpole-v0` with [REINFORCE](https://github.com/udacity/deep-reinforcement-learning/blob/master/reinforce/REINFORCE.ipynb) | solved in 691 episodes 
-- `MountainCarContinuous-v0` with [Cross-Entropy Method](https://github.com/udacity/deep-reinforcement-learning/blob/master/cross-entropy/CEM.ipynb) | solved in 47 iterations
-- `MountainCar-v0` with [Uniform-Grid Discretization](https://github.com/udacity/deep-reinforcement-learning/blob/master/discretization/Discretization_Solution.ipynb) and Q-Learning | solved in <50000 episodes
-- `Pendulum-v0` with [Deep Deterministic Policy Gradients (DDPG)](https://github.com/udacity/deep-reinforcement-learning/blob/master/ddpg-pendulum/DDPG.ipynb)
-
-### Box2d
-- `BipedalWalker-v2` with [Deep Deterministic Policy Gradients (DDPG)](https://github.com/udacity/deep-reinforcement-learning/blob/master/ddpg-bipedal/DDPG.ipynb)
-- `CarRacing-v0` with **Deep Q-Networks (DQN)** | _Coming soon!_
-- `LunarLander-v2` with [Deep Q-Networks (DQN)](https://github.com/udacity/deep-reinforcement-learning/blob/master/dqn/solution/Deep_Q_Network_Solution.ipynb) | solved in 1504 episodes
-
-### Toy Text
-- `FrozenLake-v0` with [Dynamic Programming](https://github.com/udacity/deep-reinforcement-learning/blob/master/dynamic-programming/Dynamic_Programming_Solution.ipynb)
-- `Blackjack-v0` with [Monte Carlo Methods](https://github.com/udacity/deep-reinforcement-learning/blob/master/monte-carlo/Monte_Carlo_Solution.ipynb)
-- `CliffWalking-v0` with [Temporal-Difference Methods](https://github.com/udacity/deep-reinforcement-learning/blob/master/temporal-difference/Temporal_Difference_Solution.ipynb)
-
-## Dependencies
-
-To set up your python environment to run the code in this repository, follow the instructions below.
-
-0. Install Conda via Command Line
-Anaconda is a distribution of Python that aims to simplify package management and deployment. The main use for Anaconda in this repository would be the creation of an isolated environment to install your deep learning packages and dependencies into.
-	- [Official Guide](https://docs.anaconda.com/anaconda/install)
-    - [Youtube Guide for MAC](https://www.youtube.com/watch?v=oWVTO_69U4c&t=35s)
-
-1. Create (and activate) a new environment with Python 3.6.
-
-	- __Linux__ or __Mac__: 
-	```bash
-	conda create --name drlnd python=3.6
-	source activate drlnd
-	```
-	- __Windows__: 
-	```bash
-	conda create --name drlnd python=3.6 
-	activate drlnd
-	```
-	
-2. Follow the instructions in [this repository](https://github.com/openai/gym) to perform a minimal install of OpenAI gym.  
-	- Next, install the **classic control** environment group by following the instructions [here](https://github.com/openai/gym#classic-control) using `pip install gym[classic_control]`.
-	- Then, install the **box2d** environment group by following the instructions [here](https://github.com/openai/gym#box2d) using `pip install gym[box2d]`.
-
-3. If you would like to run your projects with CUDA GPU, you can install relevant CUDA & pytorch packages via [the instructions here](https://pytorch.org/get-started/locally/). **You can verify if CUDA is used by PyTorch by running `torch.cuda.is_available()` in your python script.**
-
-4. Clone the repository (if you haven't already!), and navigate to the `python/` folder.  Then, install several dependencies.
-```bash
-git clone https://github.com/udacity/deep-reinforcement-learning.git
-cd deep-reinforcement-learning/python
-pip install .  # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
-```
-
-5. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
-```bash
-python -m ipykernel install --user --name drlnd --display-name "drlnd"
-```
-
-6. Before running code in a notebook, change the kernel to match the `drlnd` environment by using the drop-down `Kernel` menu. <br>
+**Note:** Please refer to the instructions on how to download the dependencies for these projects [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/INSTRUCTIONS.md).
 
 
-**NOTE:** You may notice that code cells may not execute as expected (E.g. Hangs for no reason). Please check `python/requirements.txt` to ensure that the appropriate tensorflow & pytorch packages are installed.
+## Introduction to Reinforcement Learning <br/>
+<!-- **Gazebo** is a useful simulation tool that can be used with ROS to render robots in a simulated environment. It comes with a model and world editor, along with presets models, that can allow for quick prototyping of a physical environment.
 
-![Kernel][image2]
+The main principles taught in this segment are: 
+1) Using model editor tool to render a robot with specified links & joints
+2) Using World editor tool to render an environment (e.g. a house)
+3) Running plugins on launch of Gazebo platform -->
 
-## Want to learn more?
 
-<p align="center">Come learn with us in the <a href="https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893">Deep Reinforcement Learning Nanodegree</a> program at Udacity!</p>
+## Project 1: Deep Q-Learning for Robot Navigation <br/>
+<!-- **Robot Operating System** is a middleware designed for communication between different robotic parts, as well as common useful packages that can be used for robotic applications. In this project, different communication models were employed for different nodes of the robot to allow the robot to drive towards a white ball whenever the robot observes it. From a high level, the 2D camera node continuously checks whether the white ball in sight, and the angle of the ball relative to the robot's heading. If white ball is in sight, a service is called to the drive node to drive towards the ball with specified linear and rotational velocity. The drive node receives this service call and publishes motion information robot's wheel actuation node for movement. 
 
-<p align="center"><a href="https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893">
- <img width="503" height="133" src="https://user-images.githubusercontent.com/10624937/42135812-1829637e-7d16-11e8-9aa1-88056f23f51e.png"></a>
+The main principles taught in this segment are: 
+1) Packages & Catkin Workspaces
+2) Writing ROS nodes & communication models (Publisher-Subscriber, Service-Client) -->
+
+<p align="center">
+  <img src="media/p1_dqn_navigation_trained_agent_raw_Trimmed.gif" width="900" height="400" />
+  <img src="media/score_vs_episodes_dqn.PNG" width="700" height="100" />
+</p>
+
+## Project 2: Deep Deterministic Policy Gradient (DDPG) for Robot Arm Continuous Control <br/>
+<!-- 2 common localization principles are the **Extended Kalman Filter (EKF)** and **Monte Carlo Localization (Particle Filter)**. Given a map of the surrounding, motor controls and sensor readings, the robot can use either of these principles to estimate its state position. In this project, I made use of the **Adaptive Monte Carlo Package** from ROS (http://wiki.ros.org/amcl). The robot starts off with a known map, with particles of equal probability weights generated randomly around the robot (shown as **green arrows**). As the robot moves, the particles likewise move. Each particle will then be assigned a probability denoting the likelihood of it being in its position and orientation, by comparing laser distance readings and the distance between it's own position to landmarks on the map. The higher the probability, the more likely a particle will survive in the resampling stage. After multiple timesteps of movement, we can observe that the **green arrows** converges accurately on the true location on the robot, indicating precise localization. 
+
+The main principles taught in this segment are: 
+1) Extended Kalman Filter
+2) Adaptive Monte Carlos Localization (Particle Filter) -->
+
+<p align="center">
+  <img src="media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="900" height="400" />
+  <img src="media/ddpg_reward_episode_graph.png" width="700" height="100" />
+</p>
+
+## Project 3: Multi-Agent Deep Deterministi Policy Gradient (MADDPG) for Cooperative Tennis Game <br/>
+<!-- A common mapping algorithm is the **Occupancy Grid Mapping**. Using sensor measurements and the Binary Bayes Filter, it computes the likelihood of an obstacle (i.e. map) given a particular grid on the map. Mapping requires the knowledge of the robot's start position, motor controls and sensor readings.
+
+**Simulataneous Localization and Mapping (SLAM)** combines principles from both localization and mapping. Using sensor readings and motor control, the robot can continuously map the surroundings, and use the map data to localize itself relative to it. The **Online SLAM approach** gives the map and robot's pose at a given point of time, while the **Full SLAM approach** gives the map and all past robot poses. The main techniques taught in this class is the **Grid-Based FastSLAM** and **GraphSLAM**, which are Online Slam and Full Slam approaches respectively. In this project, the **Real Time Appearance Based Mapping** is used as part of the Online SLAM approach, where a depth camera is used. It provides **3D localization and mapping**, with the ability to perform **loop closure** (i.e. identify previously visited locations to allow for smoother map generation). 
+
+This is available as a ROS package (http://wiki.ros.org/rtabmap_ros). Please build the rtab package from source by following the instructions in the RTAB-github link (https://github.com/introlab/rtabmap_ros).
+
+The main principles taught in this segment are: 
+1) Occupancy Grid Mapping (Binary Bayes Filter)
+2) Grid-Based FastSLAM
+3) GraphSLAM
+4) RTAB-map SLAM (Variant of GraphSLAM) -->
+
+<p align="center">
+  <img src="media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="900" height="400" />
+  <img src="media/training_score_maddpg_self_play.png" width="700" height="100" />
 </p>

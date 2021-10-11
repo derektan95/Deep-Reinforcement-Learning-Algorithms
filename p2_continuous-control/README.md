@@ -1,94 +1,101 @@
-[//]: # (Image References)
+# Project 2 Report: Deep Deterministic Policy Gradient (DDPG) for Robot Arm Continuous Control
 
-[image1]: https://user-images.githubusercontent.com/10624937/43851024-320ba930-9aff-11e8-8493-ee547c6af349.gif "Trained Agent"
-[image2]: https://user-images.githubusercontent.com/10624937/43851646-d899bf20-9b00-11e8-858c-29b5c2c94ccc.png "Crawler"
+<p align="center">
+  <img src="../media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="900" height="400" />
+</p>
+
+**Note:** Please refer to the instructions on how to install this project [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p2_continuous-control/INSTRUCTIONS.md).
+
+## Summary of Content
+- [DDPG Description](#learning-algorithm)
+- [Hyperparameters Chosen](#hyperparameters-chosen)
+- [Results](#results)
+- [Ideas for Future Work](#ideas-for-future-work)
+
+## Learning Algorithm 
+The key learning algorithm used in this project is Deep Deterministic Policy Gradients (DDPG). We have to first gain a deeper understanding of policy-based networks and actor-critic methods before we can better appreciate the use of DDPG in solving our robotic arm continuous control task. 
+
+### Policy-Based Methods vs Value-Based Methods
+
+With Policy-Based methods, agents directly learn the optimal policy. In other words, policy-based agents simply takes in the state of the environment and decides to take the action that will yield the highest rewards. With Value-Based methods, on the other hand, agents uses its experience with the environment to maintain an estimate of the optimal action-value function. The optimal policy is then obtained from the optimal action-value function estimate. Policy-based methods performs network updates using policy-gradient methods, which involves the update of network weights in a direction that increases the likelihood of the network outputting actions that maximizes rewards.  
 
 
-# Project 2: Continuous Control
+### Actor-Critic Methods
+Actor-Critic Methods is a class of algorithms that combines both policy-based and value-based networks. Policy-based networks (Actor) tend to have low bias and high variance, while Value-based networks (Critic) tend to have high bias and low variance (particularly, using the Temporal Difference Estimate). Therefore, both types of networks are combined in an attempt to achieve the best of both worlds: low bias and low variance. This will allow for more stable training and faster convergence. More information on Actor-Critic Methods can be found [here](https://arxiv.org/abs/1602.01783).
 
-### NOTE
-I have **personally attempted version 1** of this project, and have achieved an average score of +30 over 100 consecutive episodes. I have decided to leave the instructions for version 2 here for future attempts. Please refer to [the report](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p2_continuous-control/Report.md) for more specific details on my implementation.
 
-### Dependencies
-You may refer to the [Dependencies](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree) section here for instructions on how to setup your project and to install relevant dependencies. 
+### Deep Deterministic Policy Gradients 
+Deep Deterministic Policy Gradient (DDPG) Networks is similar to Actor-Critic methods in that they maintain both a policy-based network (Actor) and a value-based network (Critic). The actor network is deterministic; it takes in the state of the environment and outputs a single action that it believes would yield the highest rewards. 
 
-### Introduction
+<p align="center">
+  <img src="media/ddpg_network_training_first_output.png" width="650" height="300" />
+</p>
 
-For this project, you will work with the [Reacher](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#reacher) environment.
+This action is passed on to the critic network, which concurrently takes in the state of the environment to output a Q-value corresponding to the state-action pair. Here, the critic network is trained using a temporal difference bootstrapping step. The Q-value is then used as a baseline to train the actor network, where backpropogation is performed to maximize this Q-value. More information about DDPG can be found [here](https://arxiv.org/abs/1509.02971).
 
-![Trained Agent][image1]
+<p align="center">
+  <img src="media/ddpg_network_training.png" width="650" height="300" />
+</p>
 
-In this environment, a double-jointed arm can move to target locations. A reward of +0.1 is provided for each step that the agent's hand is in the goal location. Thus, the goal of your agent is to maintain its position at the target location for as many time steps as possible.
 
-The observation space consists of 33 variables corresponding to position, rotation, velocity, and angular velocities of the arm. Each action is a vector with four numbers, corresponding to torque applicable to two joints. Every entry in the action vector should be a number between -1 and 1.
+### Experience Replay
+Like many other DRL algorithms, DDPG utilizes an experience replay buffer to store experience tuples for training at a later stage. This breaks correlations between consequetive experience tuples and leads to more stable training.  
 
-### Distributed Training
+<p align="center">
+  <img src="media/replay_buffer_conventional.png" width="650" height="300" />
+</p>
 
-For this project, we will provide you with two separate versions of the Unity environment:
-- The first version contains a single agent.
-- The second version contains 20 identical agents, each with its own copy of the environment.  
+### DDPG Network Weights Update
+A unique feature of DDPG is the way the target network weights are updated. Conventionally, for Deep Q-Learning Networks, local network weights are copied over to the target network after a fixed number of training steps. However, it is shown to the case that a gradual transfer of network weights leads to faster convergence to optimality.
 
-The second version is useful for algorithms like [PPO](https://arxiv.org/pdf/1707.06347.pdf), [A3C](https://arxiv.org/pdf/1602.01783.pdf), and [D4PG](https://openreview.net/pdf?id=SyZipzbCb) that use multiple (non-interacting, parallel) copies of the same agent to distribute the task of gathering experience.  
+<p align="center">
+  <img src="media/ddpg_network_weights_soft_update.png" width="650" height="300" />
+</p>
 
-### Solving the Environment
+### Ornstein-Uhlenbeck (OU) Process Noise
+Additional OU noise is added to action outputs from the policy-based actor network. OU noise is modelled after a gaussian distribution. Studies have shown that adding such noise improves training convergence rate. 
 
-Note that your project submission need only solve one of the two versions of the environment. 
+<br>
 
-#### Option 1: Solve the First Version
 
-The task is episodic, and in order to solve the environment,  your agent must get an average score of +30 over 100 consecutive episodes.
+### Hyperparameters Chosen
+1) **Policy-Based Actor Model:** Linear (256) - ReLU - Linear(128) - ReLU - Linear (4)
+2) **Value-Based Critic Model:** Linear (256) - ReLU - Linear(128) - ReLU - Linear (1)
+3) **Episodes:** 3500
+4) **Max Duration:** 1000 timesteps  &nbsp;                  
+5) **Replay Buffer Size (Max)**: 1e6         
+6) **Buffer Batch Size (Sample)**: 128        
+7) **Discount Factor (Gamma)**: 0.99        
+8) **Target Param Update Rate (Tau)**: 1e-3        
+9) **Actor Learning Rate (ADAM Optimizer)**: 1e-4
+10) **Critic Learning Rate (ADAM Optimizer)**: 4e-4       
+11) **Learn Every**: 1
+12) **Soft Weights Update Every**: 20
 
-#### Option 2: Solve the Second Version
 
-The barrier for solving the second version of the environment is slightly different, to take into account the presence of many agents.  In particular, your agents must get an average score of +30 (over 100 consecutive episodes, and over all agents).  Specifically,
-- After each episode, we add up the rewards that each agent received (without discounting), to get a score for each agent.  This yields 20 (potentially different) scores.  We then take the average of these 20 scores. 
-- This yields an **average score** for each episode (where the average is over all 20 agents).
+### Results
+The results below is obtained from my implementation of DDPG for this project (Version 1). Training achieves an **average reward (over 100 episodes) of higher than +30 after 1000 episodes (Average between 900-1000)** (verify on [notebook](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p2_continuous-control/Continuous_Control.ipynb)). 
 
-The environment is considered solved, when the average (over 100 episodes) of those average scores is at least +30. 
+The 2 main hyper-parameters that made most impact on the training progress is the network **hidden layer size** and the **Soft Weights Update Every** parameter. Too many weight parameters in the hidden layers can cause difficulties in training the networks, while having too little weight parameters would result in sub-par performance due to its inability to represent and manipulate the state / action space inputs. Setting the `Soft Weights Update Every` parameter to an adequately high value ensures that the target network is only gradually updated, leading to more training stability.
 
-### Getting Started
+<p align="center">
+  <img src="media/ddpg_reward_episode_graph.png" width="500" height="300" />
+</p>
 
-1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
 
-    - **_Version 1: One (1) Agent_**
-        - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux.zip)
-        - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher.app.zip)
-        - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86.zip)
-        - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Windows_x86_64.zip)
+### Ideas for Future Work
+There are 2 possible improvements that could be made to the DDPG algorithm. 
 
-    - **_Version 2: Twenty (20) Agents_**
-        - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux.zip)
-        - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher.app.zip)
-        - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86.zip)
-        - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Windows_x86_64.zip)
-    
-    (_For Windows users_) Check out [this link](https://support.microsoft.com/en-us/help/827218/how-to-determine-whether-a-computer-is-running-a-32-bit-version-or-64) if you need help with determining if your computer is running a 32-bit version or 64-bit version of the Windows operating system.
+#### Generalized Advantage Functions (GAE)
+It is difficult to deterine how many bootstrapping steps should be used. The larger the number of steps, the lower the bias and the higher the variance. In practice, we can compute a weighted average of returns G across all possible bootstrapping steps. This works similarly to the discount factor we used in value-based methods. More information about DDPG can be found [here](https://arxiv.org/abs/1506.02438).
 
-    (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux_NoVis.zip) (version 1) or [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux_NoVis.zip) (version 2) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
+<p align="center">
+  <img src="media/generalized_advantage_function_bootstrapping.png" width="650" height="230" />
+</p>
 
-2. Place the file in the DRLND GitHub repository, in the `p2_continuous-control/` folder, and unzip (or decompress) the file. 
+#### Synchronous Training
+A multi-agent setup can be used instead of using a regular experience replay buffer to break corelations during training. Each network waits for all agents to complete a segment of their interaction with their environments, have their results synced and used to collectively update the both the actor and critic networks. The updated weights are then copied back to each agent for subsequent interactions with their environments. 
 
-### Instructions
-
-Follow the instructions in `Continuous_Control.ipynb` to get started with training your own agent!  
-
-### (Optional) Challenge: Crawler Environment
-
-After you have successfully completed the project, you might like to solve the more difficult **Crawler** environment.
-
-![Crawler][image2]
-
-In this continuous control environment, the goal is to teach a creature with four legs to walk forward without falling.  
-
-You can read more about this environment in the ML-Agents GitHub [here](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#crawler).  To solve this harder task, you'll need to download a new Unity environment.  (**Note**: Udacity students should not submit a project with this new environment.)
-
-You need only select the environment that matches your operating system:
-- Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Linux.zip)
-- Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler.app.zip)
-- Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Windows_x86.zip)
-- Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Windows_x86_64.zip)
-
-Then, place the file in the `p2_continuous-control/` folder in the DRLND GitHub repository, and unzip (or decompress) the file.  Next, open `Crawler.ipynb` and follow the instructions to learn how to use the Python API to control the agent.
-
-(_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
-
+<p align="center">
+  <img src="media/a2c_replay_buffer.png" width="650" height="300" />
+</p>

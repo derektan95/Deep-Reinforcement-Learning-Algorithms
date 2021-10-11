@@ -1,68 +1,83 @@
-[//]: # (Image References)
+# Project 3 Report: Multi-Agent Deep Deterministic Policy Gradient (MADDPG) For Cooperative Tennis Game
 
-[image1]: https://user-images.githubusercontent.com/10624937/42135623-e770e354-7d12-11e8-998d-29fc74429ca2.gif "Trained Agent"
-[image2]: https://user-images.githubusercontent.com/10624937/42135622-e55fb586-7d12-11e8-8a54-3c31da15a90a.gif "Soccer"
+<p align="center">
+  <img src="../media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="900" height="400" />
+</p>
+
+**Note:** Please refer to the instructions on how to install this project [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/INSTRUCTIONS.md).
+
+## Summary of Content
+- [MADDPG Description](#learning-algorithm)
+- [Hyperparameters Chosen](#hyperparameters-chosen)
+- [Results](#results)
+- [Ideas for Future Work](#ideas-for-future-work)
+
+## Learning Algorithm 
+The key learning algorithm used in this project is Multi-Agent Deep Deterministic Policy Gradient (MADDPG). There are 2 main variants to MADDPG taught in this course. First, we could use a **'centralized training with decentralized execution' approach** where all agents are trained collectively in simulation but act indepdently in runtime. Secondly, we can train multiple agents using the **same DDPG network through self-play**. 
 
 
-# Project 3: Collaboration and Competition
+### Issue with Traditional Approaches
+Traditional reinforcement learning approaches such as Q-Learning or policy gradient does not adapt well to multi-agent enviornments. Each agent's policy is changing as their own training progresses, and the environment becomes non-stationary from the perspective of any individual agent (in a way that is not explainable by changes in the agent's own policy). This results in training instabilities which may not converge as desired.
 
-### NOTE
-Please refer to [the report](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/Report.md) for more specific details on my implementation.
 
-### Dependencies
-You may refer to the [Dependencies](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree) section here for instructions on how to setup your project and to install relevant dependencies. 
+### Centralized Training With Decentralized Execution
+This approach is an extension to the actor-critic policy gradient method, where the critic is augmented with extra information about the policies of all other agents. Each agent maintains their own policy network, which outputs an action with local information as input. This functions similarly to the DDPG algorithm, with the exception that the central critic network has previliged access to other agents' actions during training. As a result, **training is stabilized**. An overview of this multi-agent approach can be seen below. 
 
-### Introduction
+<p align="center">
+  <img src="media/maddpg_decentralized_policy.png" width="450" height="300" />
+</p>
 
-For this project, you will work with the [Tennis](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#tennis) environment.
+The pseudo-code of this approach can be seen below: 
 
-![Trained Agent][image1]
+<p align="center">
+  <img src="media/maddpg_decentralized_policy_pseudocode.png" width="600" height="500" />
+</p>
 
-In this environment, two agents control rackets to bounce a ball over a net. If an agent hits the ball over the net, it receives a reward of +0.1.  If an agent lets a ball hit the ground or hits the ball out of bounds, it receives a reward of -0.01.  Thus, the goal of each agent is to keep the ball in play.
+Similar to DDPG, MADDPG is about training the local critic network to better estimate the true Q value of a (State, Action) pair given by all agents' policy networks. Concurrently, the local actor network is trained to provide better actions that leads to higher Q value given by the critic network. An illustration of the MADDPG training can be seen below. More information on this approach can be found [here](https://arxiv.org/pdf/1706.02275.pdf).
 
-The observation space consists of 8 variables corresponding to the position and velocity of the ball and racket. Each agent receives its own, local observation.  Two continuous actions are available, corresponding to movement toward (or away from) the net, and jumping. 
+<p align="center">
+  <img src="media/maddpg_critic_training_decentralized_policy.png" width="650" height="500" />
+  <img src="media/maddpg_policy_training_decentralized_policy.png" width="650" height="400" />
+</p>
 
-The task is episodic, and in order to solve the environment, your agents must get an average score of +0.5 (over 100 consecutive episodes, after taking the maximum over both agents). Specifically,
 
-- After each episode, we add up the rewards that each agent received (without discounting), to get a score for each agent. This yields 2 (potentially different) scores. We then take the maximum of these 2 scores.
-- This yields a single **score** for each episode.
+### Training via Self-Play
+Converse to the previous approach, the same actor and critic networks are used by agents trained via self-play. In the case of MADDPG, each agent would input their own state into the same policy network to output their respective actions. These experience tuples are stored into the same experience replay buffer, which are later sampled upon during their individual training. Each agent seeks to maximize its own rewards, and can therefore be adapted to cooperative or competitive scenarios. The main gist of this approach is adapted from the AlphaZero self-play paper [here](https://arxiv.org/pdf/1712.01815.pdf). 
 
-The environment is considered solved, when the average (over 100 episodes) of those **scores** is at least +0.5.
 
-### Getting Started
+<br>
 
-1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
-    - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux.zip)
-    - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis.app.zip)
-    - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86.zip)
-    - Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86_64.zip)
-    
-    (_For Windows users_) Check out [this link](https://support.microsoft.com/en-us/help/827218/how-to-determine-whether-a-computer-is-running-a-32-bit-version-or-64) if you need help with determining if your computer is running a 32-bit version or 64-bit version of the Windows operating system.
 
-    (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
+### Hyperparameters Chosen
+1) **Policy-Based Actor Model:** Linear (64) - ReLU - Linear(64) - ReLU - Linear (2)
+2) **Value-Based Critic Model:** Linear (64) - ReLU - Linear(64) - ReLU - Linear (1)
+3) **Episodes:** 5000 
+4) **Max Duration:** 10000 timesteps (Wanted to prolong gameplay) &nbsp;                  
+5) **Replay Buffer Size (Max)**: 1e6         
+6) **Buffer Batch Size (Sample)**: 256        
+7) **Discount Factor (Gamma)**: 0.99        
+8) **Target Param Update Rate (Tau)**: 1e-3        
+9) **Actor Learning Rate (ADAM Optimizer)**: 1e-4
+10) **Critic Learning Rate (ADAM Optimizer)**: 4e-4       
+11) **Learn Every**: 20
+12) **Soft Weights Update Every**: 1
 
-2. Place the file in the DRLND GitHub repository, in the `p3_collab-compet/` folder, and unzip (or decompress) the file. 
 
-### Instructions
+### Results
+The results below is obtained from my implementation of MADDPG via self-play for this project. Training achieves an **average reward (over 100 episodes) of higher than +0.5 after 4500 episodes (Average between 4400-4500)** (verify on [notebook](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/Tennis.ipynb)). 
 
-Follow the instructions in `Tennis.ipynb` to get started with training your own agent!  
+The main hyper-parameter that made most impact on the training progress is the network **hidden layer size** . Too many weight parameters in the hidden layers can cause difficulties in training the networks, while having too little weight parameters would result in sub-par performance due to its inability to represent and manipulate the state / action space inputs. After some experimentation, it can be concluded that a simple 2-layer network with 64 layer size each works well for this scenario.
 
-### (Optional) Challenge: Crawler Environment
+<p align="center">
+  <img src="media/training_score_maddpg_self_play.png" width="800" height="480" />
+</p>
 
-After you have successfully completed the project, you might like to solve the more difficult **Soccer** environment.
 
-![Soccer][image2]
+### Ideas for Future Work
+There are 2 possible improvements that could be made to the MADDPG algorithm, particularly for the [Centralized Training With Decentralized Execution](#centralized-Training-with-decentralized-execution) approach.
 
-In this environment, the goal is to train a team of agents to play soccer.  
+#### Agents with Policy Ensembles
+In competitive scenarios, agents can derive a strong policy by overfitting to the behaviours of their competitors. Such policies are brittle and may fail when competitors alter their strategies. To achieve a more robust approach, a collection of K different sub-policies can be trained. At each episode, a particular sub-policy for each agent is executed and added to their own replay buffer. The gradient of the ensemble can factor in the gradients of all sub-policies to minimize overfitting. More information on this approach can be found [here](https://arxiv.org/pdf/1706.02275.pdf).
 
-You can read more about this environment in the ML-Agents GitHub [here](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Learning-Environment-Examples.md#soccer-twos).  To solve this harder task, you'll need to download a new Unity environment.  (**Note**: Udacity students should not submit a project with this new environment.)
-
-You need only select the environment that matches your operating system:
-- Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Linux.zip)
-- Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer.app.zip)
-- Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Windows_x86.zip)
-- Windows (64-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Windows_x86_64.zip)
-
-Then, place the file in the `p3_collab-compet/` folder in the DRLND GitHub repository, and unzip (or decompress) the file.  Next, open `Soccer.ipynb` and follow the instructions to learn how to use the Python API to control the agent.
-
-(_For AWS_) If you'd like to train the agents on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Soccer/Soccer_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agents without enabling a virtual screen, but you will be able to train the agents.  (_To watch the agents, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
+#### Inferring policies of other agents
+The original approach assumes that each agent knows all of the other agents' policies. However, this may not be the case in reality. To counter this, each agent can main an approximation of other agents' policies. These approximate policies can be learnt by maximizing the log probability of the other agents' actions. More information on this approach can be found [here](https://arxiv.org/pdf/1706.02275.pdf).
