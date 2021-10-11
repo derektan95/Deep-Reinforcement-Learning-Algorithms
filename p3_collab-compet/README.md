@@ -1,7 +1,7 @@
 # Project 3 Report: Multi-Agent Deep Deterministic Policy Gradient (MADDPG) For Cooperative Tennis Game
 
 <p align="center">
-  <img src="../media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="900" height="400" />
+  <img src="media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="700" height="400" />
 </p>
 
 **Note:** Please refer to the instructions on how to install this project [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/INSTRUCTIONS.md).
