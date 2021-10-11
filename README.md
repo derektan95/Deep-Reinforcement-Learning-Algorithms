@@ -28,8 +28,8 @@ The main principles taught in this segment are:
 2) Writing ROS nodes & communication models (Publisher-Subscriber, Service-Client) -->
 
 <p align="center">
-  <img src="p1_navigation/media/p1_dqn_navigation_trained_agent_raw_Trimmed.gif" width="400" height="300" />
-  <img src="p1_navigation/media/score_vs_episodes_dqn.PNG" width="450" height="300" />
+  <img src="p1_navigation/media/p1_dqn_navigation_trained_agent_raw_Trimmed.gif" width="350" height="250" />
+  <img src="p1_navigation/media/score_vs_episodes_dqn.PNG" width="400" height="250" />
 </p>
 
 ## Deep Deterministic Policy Gradient (DDPG) for Robot Arm Continuous Control <br/>
@@ -40,8 +40,8 @@ The main principles taught in this segment are:
 2) Adaptive Monte Carlos Localization (Particle Filter) -->
 
 <p align="center">
-  <img src="p2_continuous-control/media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="400" height="300" />
-  <img src="p2_continuous-control/media/ddpg_reward_episode_graph.png" width="450" height="300" />
+  <img src="p2_continuous-control/media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="350" height="250" />
+  <img src="p2_continuous-control/media/ddpg_reward_episode_graph.png" width="400" height="250" />
 </p>
 
 ## Multi-Agent Deep Deterministic Policy Gradient (MADDPG) for Cooperative Tennis Game <br/>
@@ -58,6 +58,6 @@ The main principles taught in this segment are:
 4) RTAB-map SLAM (Variant of GraphSLAM) -->
 
 <p align="center">
-  <img src="p3_collab-compet/media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="400" height="300" />
-  <img src="p3_collab-compet/media/training_score_maddpg_self_play.png" width="450" height="300" />
+  <img src="p3_collab-compet/media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="350" height="250" />
+  <img src="p3_collab-compet/media/training_score_maddpg_self_play.png" width="400" height="250" />
 </p>
