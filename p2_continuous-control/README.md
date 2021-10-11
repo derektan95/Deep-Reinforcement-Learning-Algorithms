@@ -1,7 +1,7 @@
-# Project 2 Report: Deep Deterministic Policy Gradient (DDPG) for Robot Arm Continuous Control
+# Project 2: Deep Deterministic Policy Gradient (DDPG) for Robot Arm Continuous Control
 
 <p align="center">
-  <img src="../media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="900" height="400" />
+  <img src="media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="700" height="400" />
 </p>
 
 **Note:** Please refer to the instructions on how to install this project [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p2_continuous-control/INSTRUCTIONS.md).
