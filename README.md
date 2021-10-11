@@ -32,7 +32,7 @@ The main principles taught in this segment are:
   <img src="p1_navigation/media/score_vs_episodes_dqn.PNG" width="400" height="250" />
 </p>
 
-## Deep Deterministic Policy Gradient (DDPG) for Robot Arm Continuous Control <br/>
+## Deep Deterministic Policy Gradient for Robot Arm Continuous Control <br/>
 <!-- 2 common localization principles are the **Extended Kalman Filter (EKF)** and **Monte Carlo Localization (Particle Filter)**. Given a map of the surrounding, motor controls and sensor readings, the robot can use either of these principles to estimate its state position. In this project, I made use of the **Adaptive Monte Carlo Package** from ROS (http://wiki.ros.org/amcl). The robot starts off with a known map, with particles of equal probability weights generated randomly around the robot (shown as **green arrows**). As the robot moves, the particles likewise move. Each particle will then be assigned a probability denoting the likelihood of it being in its position and orientation, by comparing laser distance readings and the distance between it's own position to landmarks on the map. The higher the probability, the more likely a particle will survive in the resampling stage. After multiple timesteps of movement, we can observe that the **green arrows** converges accurately on the true location on the robot, indicating precise localization. 
 
 The main principles taught in this segment are: 
@@ -44,7 +44,7 @@ The main principles taught in this segment are:
   <img src="p2_continuous-control/media/ddpg_reward_episode_graph.png" width="400" height="250" />
 </p>
 
-## Multi-Agent Deep Deterministic Policy Gradient (MADDPG) for Cooperative Tennis Game <br/>
+## Multi-Agent Deep Deterministic Policy Gradient for Cooperative Tennis <br/>
 <!-- A common mapping algorithm is the **Occupancy Grid Mapping**. Using sensor measurements and the Binary Bayes Filter, it computes the likelihood of an obstacle (i.e. map) given a particular grid on the map. Mapping requires the knowledge of the robot's start position, motor controls and sensor readings.
 
 **Simulataneous Localization and Mapping (SLAM)** combines principles from both localization and mapping. Using sensor readings and motor control, the robot can continuously map the surroundings, and use the map data to localize itself relative to it. The **Online SLAM approach** gives the map and robot's pose at a given point of time, while the **Full SLAM approach** gives the map and all past robot poses. The main techniques taught in this class is the **Grid-Based FastSLAM** and **GraphSLAM**, which are Online Slam and Full Slam approaches respectively. In this project, the **Real Time Appearance Based Mapping** is used as part of the Online SLAM approach, where a depth camera is used. It provides **3D localization and mapping**, with the ability to perform **loop closure** (i.e. identify previously visited locations to allow for smoother map generation). 
