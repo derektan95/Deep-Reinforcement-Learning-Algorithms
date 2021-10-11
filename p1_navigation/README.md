@@ -1,7 +1,7 @@
 # Project 1 Report: Deep Q-Learning for Robot Navigation
 
 <p align="center">
-  <img src="../media/p1_dqn_navigation_trained_agent_raw_Trimmed.gif" width="900" height="400" />
+  <img src="media/p1_dqn_navigation_trained_agent_raw_Trimmed.gif" width="700" height="400" />
 </p>
 
 **Note:** Please refer to the instructions on how to install this project [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p1_navigation/INSTRUCTIONS.md).
