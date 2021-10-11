@@ -114,12 +114,12 @@ to be chosen. Hence, our current approach often overestimate the Q-value since w
 To fix this, we can have a separate set of neural network weights parameters to 'check' with the original set of parameters in the Policy Evaluation step. In other words, both set of function approximators with different weight parameters must agree with each other in order to achieve an overall high Q-value. Conveniently, we can use the frozen target-Q network as the 2nd network. For more information, please refer to this [Research Paper](https://arxiv.org/abs/1509.06461). 
 
 <p align="center">
-  <img src="media/double_dqn.PNG" width="700" height="230" />
+  <img src="media/double_dqn.PNG" width="500" height="230" />
 </p>
 
 #### Prioritized Experience Replay
 There are some experiences in the replay bugger that are considered to be more important than the other. This happens when the Temporal-Difference Error in the Policy Evaluation step gives us a larger difference between the target-Q network and our current local network, implying that there is still alot of learning to be done. We can therefore save such experiences in the replay buffer along with a **priority parameter** represented in the form of a probability value. The overall modifications that have to be made can be seen in the image below. For more information, please refer to this [Research Paper](https://arxiv.org/abs/1511.05952). 
 
 <p align="center">
-  <img src="media/prioritized_experience_replay.PNG" width="900" height="300" />
+  <img src="media/prioritized_experience_replay.PNG" width="700" height="300" />
 </p>
