@@ -14,7 +14,7 @@ https://confirm.udacity.com/XLGDCKNX
 ### Summary<br/>
 Deep reinforcement learning (deep RL) is a subfield of machine learning that combines reinforcement learning (RL) and deep learning. RL considers the problem of a computational agent learning to make decisions by trial and error. Deep RL incorporates deep learning into the solution, allowing agents to make decisions from unstructured input data without manual engineering of the state space. Deep RL algorithms are able to take in very large inputs (e.g. every pixel rendered to the screen in a video game) and decide what actions to perform to optimize an objective (eg. maximizing the game score). Deep reinforcement learning has been used for a diverse set of applications including but not limited to robotics, video games, natural language processing, computer vision, education, transportation, finance and healthcare [[1]](https://en.wikipedia.org/wiki/Deep_reinforcement_learning). 
 
-The following projects focuses on **model free reinforcement learning**, where the agent has no concept of how its current action will affect its next state.
+The following projects focuses on **model free reinforcement learning**, where the agent has no concept of how its current action will affect its next state. In more technical terms, this family of algorithms do not use the Transition Probability Distribution associated with the Markov Decision Process.
 
 
 ## Introduction to Reinforcement Learning <br/>
