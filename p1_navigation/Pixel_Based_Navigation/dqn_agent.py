@@ -8,14 +8,17 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 64         # minibatch size
-GAMMA = 0.99            # discount factor
-TAU = 1e-3              # for soft update of target parameters
-LR = 5e-4               # learning rate 
-UPDATE_EVERY = 4        # how often to update the network
+BUFFER_SIZE = int(1e6)              # replay buffer size
+BATCH_SIZE = 64                     # minibatch size
+GAMMA = 0.99                        # discount factor
+TAU = 1e-3                          # for soft update of target parameters
+LR = 5e-4                           # learning rate 
+LEARN_EVERY = 4                     # how often to update the LOCAL network
+UPDATE_TARGET_WEIGHTS_EVERY = 500   # how often to update the TARGET network
+
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cpu")
 
 class Agent():
     """Interacts with and learns from the environment."""
@@ -40,16 +43,35 @@ class Agent():
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
-        # Initialize time step (for updating every UPDATE_EVERY steps)
-        self.t_step = 0
+        
+        # Initialize time step
+        self.learn_t_step = 0       # for updating every LEARN_EVERY steps
+        self.soft_update_t_step = 0 # for updating every UPDATE_TARGET_WEIGHTS_EVERY steps
+
+
+        ## Print networks
+        print("network_local", self.qnetwork_local)
+        print("network_target", self.qnetwork_target)
+        print("optimizer", self.optimizer)
+        
+        # Print Hyper-parameters
+        print("BUFFER_SIZE: ", BUFFER_SIZE)
+        print("BATCH_SIZE: ", BATCH_SIZE)
+        print("GAMMA: ", GAMMA)
+        print("TAU: ", TAU)
+        print("LR: ", LR)
+        print("LEARN_EVERY: ", LEARN_EVERY)
+        print("UPDATE_TARGET_WEIGHTS_EVERY: ", UPDATE_TARGET_WEIGHTS_EVERY)
     
     def step(self, state, action, reward, next_state, done):
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
         
-        # Learn every UPDATE_EVERY time steps.
-        self.t_step = (self.t_step + 1) % UPDATE_EVERY
-        if self.t_step == 0:
+        # Learn every LEARN_EVERY time steps.
+        self.learn_t_step = (self.learn_t_step + 1) % LEARN_EVERY
+        self.soft_update_t_step = (self.soft_update_t_step + 1) % UPDATE_TARGET_WEIGHTS_EVERY
+
+        if self.learn_t_step == 0:
             # If enough samples are available in memory, get random subset and learn
             if len(self.memory) > BATCH_SIZE:
                 experiences = self.memory.sample()
@@ -64,6 +86,7 @@ class Agent():
             eps (float): epsilon, for epsilon-greedy action selection
         """
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
+
         self.qnetwork_local.eval()                           # .eval() == (self.training=false)
         with torch.no_grad():
             action_values = self.qnetwork_local(state)       # INFERENCE: NO NEED TO UPDATE WEIGHTS / BIASES VIA BACKPROP
@@ -87,6 +110,11 @@ class Agent():
 
         ## TODO: compute and minimize the loss
         "*** YOUR CODE HERE ***"
+
+        # # For greyscale, unsqueeze the 1 dimension that is lost in the process
+        # next_states = torch.unsqueeze(next_states, 1)
+        # states = torch.unsqueeze(states, 1)
+        # print("next_states: ", next_states.shape)
         
         # Target actions from stable Fixed Target-Q Neural Network
         # Detach since no need to update weights & biases param in Target Network - They are cloned from qnetwork_local
@@ -98,13 +126,14 @@ class Agent():
         Q_expecteds = Q_expecteds_arr[torch.arange(Q_expecteds_arr.shape[0]).long(), actions.squeeze().long()].unsqueeze(1)
         
         # Compute & minimize the loss
-        loss = F.mse_loss(Q_expecteds, Q_targets)
-        self.optimizer.zero_grad()          # Zero out all of the gradients for the variables which the optimizer will update
-        loss.backward()                     # Compute the gradient of the loss wrt each parameter of the model.
-        self.optimizer.step()               # Actually update the parameters of the model using the gradients computed by the backwards pass.
+        loss = F.mse_loss(Q_expecteds, Q_targets)   # Mean-Squared Error loss across mini-batch of experiences relative to targets array
+        self.optimizer.zero_grad()                  # Zero out all of the gradients for the variables which the optimizer will update
+        loss.backward()                             # Compute the gradient of the loss wrt each parameter of the model.
+        self.optimizer.step()                       # Actually update the parameters of the model using the gradients computed by the backwards pass.
 
         # ------------------- update target network ------------------- #
-        self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)                     
+        if self.soft_update_t_step == 0:
+            self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)           
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
