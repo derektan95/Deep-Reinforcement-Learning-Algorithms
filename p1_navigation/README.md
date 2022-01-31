@@ -80,6 +80,13 @@ In summary, the Pseudo-code of Deep Q-Learning would look like this:
   <img src="media/dqn_improved_pseudo_code.PNG" width="700" height="500" />
 </p>
 
+A simplified flowchart for DQN looks like this: 
+
+<p align="center">
+  <img src="media/dqn_flowchart.jpg" width="700" height="550" />
+</p>
+
+
 <br>
 
 ### Hyperparameters Chosen
