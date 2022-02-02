@@ -27,6 +27,7 @@ class Actor(nn.Module):
         super().__init__()    
         
         self.seed = torch.manual_seed(seed)
+        self.bn0 = nn.BatchNorm1d(state_size)
         self.fc1 = nn.Linear(state_size, fc1_units)
         self.bn1 = nn.BatchNorm1d(fc1_units)
         self.fc2 = nn.Linear(fc1_units, fc2_units)
@@ -46,7 +47,8 @@ class Actor(nn.Module):
         if state.dim() == 1:
             state = state.unsqueeze(0)
 
-        x = F.relu(self.bn1(self.fc1(state)))
+        x = self.bn0(state)
+        x = F.relu(self.bn1(self.fc1(x)))
         x = F.relu(self.bn2(self.fc2(x)))
         x = torch.tanh(self.fc3(x))    # F.tanh is deperecated
         return x.squeeze()             # Remove extra dimensions to output action list
@@ -70,6 +72,7 @@ class Critic(nn.Module):
         super().__init__()    
         
         self.seed = torch.manual_seed(seed)
+        self.bn0 = nn.BatchNorm1d(state_size)
         self.fc1 = nn.Linear(state_size, fc1_units)
         self.bn1 = nn.BatchNorm1d(fc1_units)
         self.fc2 = nn.Linear(fc1_units+action_size, fc2_units)
@@ -83,7 +86,8 @@ class Critic(nn.Module):
 
     def forward(self, state, action):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-        xs = F.relu(self.bn1(self.fc1(state)))
+        x = self.bn0(state)
+        x = F.relu(self.bn1(self.fc1(x)))
         x = torch.cat((xs, action), dim=1)
         x = F.relu(self.fc2(x))
         return self.fc3(x)
