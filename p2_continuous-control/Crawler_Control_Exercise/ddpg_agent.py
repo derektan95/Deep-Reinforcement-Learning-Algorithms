@@ -16,9 +16,9 @@ TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor 
 LR_CRITIC = 4e-4        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay          (ORIGINAL: 0)
-LEARN_EVERY = 10                 # how often for local networks to learn
+LEARN_EVERY = 4                  # how often for local networks to learn
 SOFT_WEIGHTS_UPDATE_EVERY = 1    # how often to copy weights over to target networks
-
+N_STEP_BOOTSTRAP = 5             # N-Step bootstrapping for Temporal Difference Update Calculations
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -87,6 +87,7 @@ class Agent():
 #                 print("LEARNING, self.t_step: ", self.t_step)
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
+                # print("LEARNING...")
 
                 
     def act(self, state, add_noise=True):
@@ -122,8 +123,11 @@ class Agent():
         # Get predicted next-state actions and Q values from target models
         actions_next = self.actor_target(next_states)
         Q_targets_next = self.critic_target(next_states, actions_next)
+
         # Compute Q targets for current states (y_i)
-        Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
+        # Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
+        Q_targets = rewards + ((gamma**N_STEP_BOOTSTRAP) * Q_targets_next * (1 - dones))
+
         # Compute critic loss
         Q_expected = self.critic_local(states, actions)
         critic_loss = F.mse_loss(Q_expected, Q_targets)
