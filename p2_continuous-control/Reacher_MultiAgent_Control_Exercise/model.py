@@ -4,10 +4,19 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-def hidden_init(layer):
-    fan_in = layer.weight.data.size()[0]
-    lim = 1. / np.sqrt(fan_in)
-    return (-lim, lim)
+# def hidden_init(layer):
+#     fan_in = layer.weight.data.size()[0]
+#     lim = 1. / np.sqrt(fan_in)
+#     return (-lim, lim)
+
+
+WEIGHT_LOW = -3e-2
+WEIGHT_HIGH = 3e-2
+
+def initialize_weights(net, low, high):
+    for param in net.parameters():
+        param.data.uniform_(low, high)
+
 
 class Actor(nn.Module):
     """Actor (Policy) Model."""
@@ -30,19 +39,20 @@ class Actor(nn.Module):
         self.fc1 = nn.Linear(state_size, fc1_units)
         self.fc2 = nn.Linear(fc1_units, fc2_units)
         self.fc3 = nn.Linear(fc2_units, action_size)
-        self.reset_parameters()
+        initialize_weights(self, WEIGHT_LOW, WEIGHT_HIGH)
+        # self.reset_parameters()
 
-    def reset_parameters(self):
-        self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
-        self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
-        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
+    # def reset_parameters(self):
+        # self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
+        # self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
+        # self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
 
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
-        return torch.tanh(self.fc3(x))    # F.tanh is deperecated
+        return (self.fc3(x)).tanh()    # F.tanh is deperecated
 
 
 class Critic(nn.Module):
@@ -66,12 +76,13 @@ class Critic(nn.Module):
         self.fc1 = nn.Linear(state_size, fc1_units)
         self.fc2 = nn.Linear(fc1_units+action_size, fc2_units)
         self.fc3 = nn.Linear(fc2_units, num_atoms)
-        self.reset_parameters()
+        initialize_weights(self, WEIGHT_LOW, WEIGHT_HIGH)
+        # self.reset_parameters()
 
-    def reset_parameters(self):
-        self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
-        self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
-        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
+    # def reset_parameters(self):
+    #     self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
+    #     self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
+    #     self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state, action, log=False):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
