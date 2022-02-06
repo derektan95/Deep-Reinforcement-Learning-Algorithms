@@ -11,7 +11,7 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_size, action_size, seed, fc1_units=400, fc2_units=300):
+    def __init__(self, state_size, action_size, seed, fc1_units=256, fc2_units=128):
         """Initialize parameters and build model.
         Params
         ======
@@ -26,8 +26,11 @@ class Actor(nn.Module):
         super().__init__()    
         
         self.seed = torch.manual_seed(seed)
+        self.bn0 = nn.BatchNorm1d(state_size)
         self.fc1 = nn.Linear(state_size, fc1_units)
+        self.bn1 = nn.BatchNorm1d(fc1_units)
         self.fc2 = nn.Linear(fc1_units, fc2_units)
+        self.bn2 = nn.BatchNorm1d(fc2_units)
         self.fc3 = nn.Linear(fc2_units, action_size)
         self.reset_parameters()
 
@@ -39,15 +42,21 @@ class Actor(nn.Module):
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
 
-        x = F.relu(self.fc1(state))
-        x = F.relu(self.fc2(x))
-        return (self.fc3(x)).tanh()    # F.tanh is deperecated
+        # Add 1 dimension @dim=0 for batchnorm to work properly
+        if state.dim() == 1:
+            state = state.unsqueeze(0)
+
+        x = self.bn0(state)
+        x = F.relu(self.bn1(self.fc1(x)))
+        x = F.relu(self.bn2(self.fc2(x)))
+        x = torch.tanh(self.fc3(x))    # F.tanh is deperecated
+        return x.squeeze()             # Remove extra dimensions to output action list
 
 
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, seed, num_atoms, fc1_units=400, fc2_units=300):
+    def __init__(self, state_size, action_size, seed, num_atoms, fc1_units=256, fc2_units=128):
         """Initialize parameters and build model.
         Params
         ======
@@ -62,7 +71,9 @@ class Critic(nn.Module):
         super().__init__()    
         
         self.seed = torch.manual_seed(seed)
+        self.bn0 = nn.BatchNorm1d(state_size)
         self.fc1 = nn.Linear(state_size, fc1_units)
+        self.bn1 = nn.BatchNorm1d(fc1_units)
         self.fc2 = nn.Linear(fc1_units+action_size, fc2_units)
         self.fc3 = nn.Linear(fc2_units, num_atoms)
         self.reset_parameters()
@@ -74,22 +85,24 @@ class Critic(nn.Module):
 
     def forward(self, state, action, log=False):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-        x = F.relu(self.fc1(state))
+        x = self.bn0(state)
+        x = F.relu(self.bn1(self.fc1(x)))
         x = torch.cat((x, action), dim=1)
         x = F.relu(self.fc2(x))
-        logits = self.fc3(x)
 
+        # Only calculate the type of softmax needed by the foward call, to save
+        # a modest amount of calculation across 1000s of timesteps.
         if log:
-            return F.log_softmax(logits, dim=-1)
+            return F.log_softmax(self.fc3(x), dim=-1)
         else:
-            return F.softmax(logits, dim=-1)
+            return F.softmax(self.fc3(x), dim=-1)
 
 ####################################################################################################
 
 # class Actor(nn.Module):
 #     """Actor (Policy) Model."""
 
-#     def __init__(self, state_size, action_size, seed, fc1_units=256, fc2_units=128):
+#     def __init__(self, state_size, action_size, seed, fc1_units=400, fc2_units=300):
 #         """Initialize parameters and build model.
 #         Params
 #         ======
@@ -104,11 +117,8 @@ class Critic(nn.Module):
 #         super().__init__()    
         
 #         self.seed = torch.manual_seed(seed)
-#         self.bn0 = nn.BatchNorm1d(state_size)
 #         self.fc1 = nn.Linear(state_size, fc1_units)
-#         self.bn1 = nn.BatchNorm1d(fc1_units)
 #         self.fc2 = nn.Linear(fc1_units, fc2_units)
-#         self.bn2 = nn.BatchNorm1d(fc2_units)
 #         self.fc3 = nn.Linear(fc2_units, action_size)
 #         self.reset_parameters()
 
@@ -120,27 +130,15 @@ class Critic(nn.Module):
 #     def forward(self, state):
 #         """Build an actor (policy) network that maps states -> actions."""
 
-#         # x = F.relu(self.fc1(state))
-#         # x = F.relu(self.fc2(x))
-#         # logits = self.fc3(x)
-#         # action = logits.tanh()
-#         # return action
-
-#         # Add 1 dimension @dim=0 for batchnorm to work properly
-#         if state.dim() == 1:
-#             state = state.unsqueeze(0)
-
-#         x = self.bn0(state)
-#         x = F.relu(self.bn1(self.fc1(x)))
-#         x = F.relu(self.bn2(self.fc2(x)))
-#         x = torch.tanh(self.fc3(x))    # F.tanh is deperecated
-#         return x.squeeze()             # Remove extra dimensions to output action list
+#         x = F.relu(self.fc1(state))
+#         x = F.relu(self.fc2(x))
+#         return (self.fc3(x)).tanh()    # F.tanh is deperecated
 
 
 # class Critic(nn.Module):
 #     """Critic (Value) Model."""
 
-#     def __init__(self, state_size, action_size, seed, num_atoms, fc1_units=256, fc2_units=128):
+#     def __init__(self, state_size, action_size, seed, num_atoms, fc1_units=400, fc2_units=300):
 #         """Initialize parameters and build model.
 #         Params
 #         ======
@@ -155,9 +153,7 @@ class Critic(nn.Module):
 #         super().__init__()    
         
 #         self.seed = torch.manual_seed(seed)
-#         self.bn0 = nn.BatchNorm1d(state_size)
 #         self.fc1 = nn.Linear(state_size, fc1_units)
-#         self.bn1 = nn.BatchNorm1d(fc1_units)
 #         self.fc2 = nn.Linear(fc1_units+action_size, fc2_units)
 #         self.fc3 = nn.Linear(fc2_units, num_atoms)
 #         self.reset_parameters()
@@ -169,14 +165,12 @@ class Critic(nn.Module):
 
 #     def forward(self, state, action, log=False):
 #         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
-#         x = self.bn0(state)
-#         x = F.relu(self.bn1(self.fc1(x)))
+#         x = F.relu(self.fc1(state))
 #         x = torch.cat((x, action), dim=1)
 #         x = F.relu(self.fc2(x))
+#         logits = self.fc3(x)
 
-#         # Only calculate the type of softmax needed by the foward call, to save
-#         # a modest amount of calculation across 1000s of timesteps.
 #         if log:
-#             return F.log_softmax(self.fc3(x), dim=-1)
+#             return F.log_softmax(logits, dim=-1)
 #         else:
-#             return F.softmax(self.fc3(x), dim=-1)
+#             return F.softmax(logits, dim=-1)
