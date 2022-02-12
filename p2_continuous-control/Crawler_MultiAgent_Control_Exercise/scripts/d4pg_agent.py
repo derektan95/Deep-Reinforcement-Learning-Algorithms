@@ -140,7 +140,9 @@ class D4PG_Agent():
         # Calculate Yᵢ from target networks using πθ' and Zw'
         # These tensors are not needed for backpropogation, so detach from the
         # calculation graph (literally doubles runtime if this is not detached)
-        target_dist = self.get_projected_critic_target(rewards, next_states).detach()
+        target_actions = self.actor_target(next_states)
+        target_probs = self.critic_target(next_states, target_actions).detach()
+        projected_target_probs = self.categorical_projection(rewards, target_probs, dones)
 
         # Calculate log probability DISTRIBUTION using Zw w.r.t. stored actions
         log_probs = self.critic_local(states, actions, log=True)
@@ -148,7 +150,7 @@ class D4PG_Agent():
         # Calculate the critic network LOSS (Cross Entropy), CE-loss is ideal
         # for categorical value distributions as utilized in D4PG.
         # estimates distance between target and projected values
-        critic_loss = -(target_dist * log_probs).sum(-1).mean()
+        critic_loss = -(projected_target_probs * log_probs).sum(-1).mean()
 
         # Predict action for actor network loss calculation using πθ
         predicted_action = self.actor_local(states)
@@ -216,18 +218,18 @@ class D4PG_Agent():
 
         target_model.load_state_dict(local_model.state_dict())
 
-    def get_projected_critic_target(self, rewards, next_states):
-        """
-        Calculate Yᵢ from target networks using πθ' and Zw'
-        """
+    # def get_projected_critic_target(self, rewards, next_states):
+    #     """
+    #     Calculate Yᵢ from target networks using πθ' and Zw'
+    #     """
 
-        target_actions = self.actor_target(next_states)
-        target_probs = self.critic_target(next_states, target_actions)
-        # Project the categorical distribution onto the supports
-        projected_probs = self.categorical_projection(rewards, target_probs)
-        return projected_probs
+    #     target_actions = self.actor_target(next_states)
+    #     target_probs = self.critic_target(next_states, target_actions)
+    #     # Project the categorical distribution onto the supports
+    #     projected_probs = self.categorical_projection(rewards, target_probs)
+    #     return projected_probs
 
-    def categorical_projection(self, rewards, probs):
+    def categorical_projection(self, rewards, probs, dones):
         """
         Returns the projected value distribution for the input state/action pair
 
@@ -244,11 +246,12 @@ class D4PG_Agent():
         rollout = self.params.n_step_bootstrap
 
         rewards = rewards.unsqueeze(-1)
+        dones = dones.unsqueeze(-1).type(torch.float)
         delta_z = (vmax - vmin) / (num_atoms - 1)
 
         # Rewards were stored with 0->(N-1) summed, take Reward and add it to
         # the discounted expected reward at N (ROLLOUT) timesteps
-        projected_atoms = rewards + gamma**rollout * atoms.unsqueeze(0)
+        projected_atoms = rewards + gamma**rollout * atoms.unsqueeze(0) * (1 - dones)
         projected_atoms.clamp_(vmin, vmax)
         b = ((projected_atoms - vmin) / delta_z).squeeze()
 
