@@ -11,6 +11,7 @@ class Params():
         self.max_t = 1000                        # Max sim step before episode terminates
         self.print_every = 100                   # Prints every x episodes
         self.save_every = 100                    # Saves weights every x episodes
+        self.log_weights_every = 1              # How often to log weights in Tensorboard
         self.terminate_on_target_score = False   # Terminates simulation upon reaching target score
         self.target_score = 1800                 # Target score to achieve before sim termination 
         self.prefill_memory_qty = 5000           # Experience (SARS) qty to prefill replay buffer before training
@@ -20,6 +21,7 @@ class Params():
         # General Hyper-params
         self.buffer_size = int(3e5)              # replay buffer size
         self.batch_size = 128                    # minibatch size
+        self.hidden_sizes=(256, 128)             # Hidden layer sizes
         self.gamma = 0.99                        # discount factor
         self.tau = 1e-3                          # for soft update of target parameters
         self.lr_actor = 5e-4                     # learning rate of the actor 
@@ -30,6 +32,10 @@ class Params():
         self.soft_weights_update_every = 10      # how often to copy weights over to target networks (Gradually)
         self.hard_weights_update_every = 350     # how often to copy weights over to target networks (Instant)
         self.n_step_bootstrap = 5                # N-Step bootstrapping for Temporal Difference Update Calculations
+
+        # Misc
+        self.checkpoint_actor_weights_dir = 'weights/checkpoint_actor'
+        self.checkpoint_critic_weights_dir = 'weights/checkpoint_critic'
 
         # D4PG STUFF
         # Lower and upper bounds of critic value output distribution, these will vary with environment
@@ -48,6 +54,7 @@ class Params():
         print("RANDOM SEED: ", self.random_seed)
         print("BUFFER_SIZE: ", self.buffer_size)
         print("BATCH_SIZE: ", self.batch_size)
+        print("HIDDEN_SIZES: ", self.hidden_sizes)
         print("GAMMA: ", self.gamma)
         print("TAU: ", self.tau)
         print("LR_ACTOR: ", self.lr_actor)
@@ -64,3 +71,21 @@ class Params():
         print("VMAX: ", self.vmax)
         print("NUM_ATOMS: ", self.num_atoms)
         print("===========================================\n")
+
+
+    def get_hparam_dict(self):
+        """ For tensorboard tracking of impt hyper-params. """
+        hparam_dict = {"batch_size": self.batch_size, "actor_lr": self.lr_actor, "critic_lr": self.lr_critic,
+                       "hard_update_every": self.hard_weights_update_every, "vmin": self.vmin, "vmax": self.vmax, 
+                       "num_atoms": self.num_atoms}
+
+        return hparam_dict
+
+    # def get_hparam_comment(self):
+    #     """ 
+    #     Generates runfile tensorboard folder name.
+    #     NOTE: For some reason, tb doesn't accept folder names that are too lengthy. Must limit number of hyperparams.
+    #     """
+
+    #     comment = f'bs={self.batch_size} a_lr={self.lr_actor} c_lr={self.lr_critic} update_every={self.hard_weights_update_every} vmax={self.vmax} vmin={self.vmin}'
+    #     return comment

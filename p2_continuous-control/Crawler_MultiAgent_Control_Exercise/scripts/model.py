@@ -11,27 +11,26 @@ def hidden_init(layer):
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_size, action_size, seed, fc1_units=256, fc2_units=128):
+    def __init__(self, state_size, action_size, params):
         """Initialize parameters and build model.
         Params
         ======
             state_size (int): Dimension of each state
             action_size (int): Dimension of each action
             seed (int): Random seed
-            fc1_units (int): Number of nodes in first hidden layer
-            fc2_units (int): Number of nodes in second hidden layer
+            hidden_sizes (tuple of ints): Number of nodes in the hidden layers
         """
         # Needed to inherit functionalities from nn.Module
         # super(Actor, self).__init__()
         super().__init__()    
         
-        self.seed = torch.manual_seed(seed)
+        self.seed = torch.manual_seed(params.random_seed)
         self.bn0 = nn.BatchNorm1d(state_size)
-        self.fc1 = nn.Linear(state_size, fc1_units)
-        self.bn1 = nn.BatchNorm1d(fc1_units)
-        self.fc2 = nn.Linear(fc1_units, fc2_units)
-        self.bn2 = nn.BatchNorm1d(fc2_units)
-        self.fc3 = nn.Linear(fc2_units, action_size)
+        self.fc1 = nn.Linear(state_size, params.hidden_sizes[0])
+        self.bn1 = nn.BatchNorm1d(params.hidden_sizes[0])
+        self.fc2 = nn.Linear(params.hidden_sizes[0], params.hidden_sizes[1])
+        self.bn2 = nn.BatchNorm1d(params.hidden_sizes[1])
+        self.fc3 = nn.Linear(params.hidden_sizes[1], action_size)
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -56,26 +55,25 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, seed, num_atoms, fc1_units=256, fc2_units=128):
+    def __init__(self, state_size, action_size, params):
         """Initialize parameters and build model.
         Params
         ======
             state_size (int): Dimension of each state
             action_size (int): Dimension of each action
             seed (int): Random seed
-            fc1_units (int): Number of nodes in the first hidden layer
-            fc2_units (int): Number of nodes in the second hidden layer
+            hidden_sizes (tuple of ints): Number of nodes in the hidden layers
         """
         # Needed to inherit functionalities from nn.Module
         # super(Critic, self).__init__()
         super().__init__()    
         
-        self.seed = torch.manual_seed(seed)
+        self.seed = torch.manual_seed(params.random_seed)
         self.bn0 = nn.BatchNorm1d(state_size)
-        self.fc1 = nn.Linear(state_size, fc1_units)
-        self.bn1 = nn.BatchNorm1d(fc1_units)
-        self.fc2 = nn.Linear(fc1_units+action_size, fc2_units)
-        self.fc3 = nn.Linear(fc2_units, num_atoms)
+        self.fc1 = nn.Linear(state_size, params.hidden_sizes[0])
+        self.bn1 = nn.BatchNorm1d(params.hidden_sizes[0])
+        self.fc2 = nn.Linear(params.hidden_sizes[0]+action_size, params.hidden_sizes[1])
+        self.fc3 = nn.Linear(params.hidden_sizes[1], params.num_atoms)
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -96,6 +94,23 @@ class Critic(nn.Module):
             return F.log_softmax(self.fc3(x), dim=-1)
         else:
             return F.softmax(self.fc3(x), dim=-1)
+
+class ActorCriticWrapper(nn.Module):
+    """ A wrapper, purely for visualization of multiple graphs on Tensorboard"""
+
+    def __init__(self, state_size, action_size, params):
+        super().__init__()
+
+        # build policy and value functions
+        self.actor = Actor(state_size, action_size, params).to(params.device)
+        self.critic = Critic(state_size, action_size, params).to(params.device)
+
+    def forward(self, state, act):
+
+        # Perform a forward pass through all the networks and return the result
+        q1 = self.actor(state)
+        q2 = self.critic(state, act)
+        return q1, q2
 
 ####################################################################################################
 

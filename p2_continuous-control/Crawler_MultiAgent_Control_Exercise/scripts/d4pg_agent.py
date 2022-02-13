@@ -63,13 +63,13 @@ class D4PG_Agent():
         self.device = self.params.device
 
         # Actor Network (w/ Target Network)
-        self.actor_local = Actor(state_size, action_size, self.params.random_seed).to(self.device)
-        self.actor_target = Actor(state_size, action_size, self.params.random_seed).to(self.device)
+        self.actor_local = Actor(state_size, action_size, self.params).to(self.device)
+        self.actor_target = Actor(state_size, action_size, self.params).to(self.device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.params.lr_actor, weight_decay=self.params.weight_decay)
 
         # Critic Network (w/ Target Network)
-        self.critic_local = Critic(state_size, action_size, self.params.random_seed, self.params.num_atoms).to(self.device)
-        self.critic_target = Critic(state_size, action_size, self.params.random_seed, self.params.num_atoms).to(self.device)
+        self.critic_local = Critic(state_size, action_size, self.params).to(self.device)
+        self.critic_target = Critic(state_size, action_size, self.params).to(self.device)
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.params.lr_critic, weight_decay=self.params.weight_decay)
 
         # Others

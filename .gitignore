@@ -102,3 +102,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# IGNORE ALL TENSORBOARD RUN FILES
+runs/
