@@ -23,6 +23,9 @@ class ReplayBuffer:
         self.nstep_exp_buffer = deque(maxlen=self.params.n_step_bootstrap)
         self.seed = random.seed(seed)
 
+        torch.autograd.set_detect_anomaly(True)         
+        
+
     # Save experiences in replay buffer (w/ N-Step Bootstrap)
     def fill_nstep_buffer(self, experiences, clear_nstep_buffer=False):
         

@@ -56,6 +56,9 @@ class D4PG_Agent():
             state_size (int): dimension of each state
             action_size (int): dimension of each action
         """
+
+        torch.autograd.set_detect_anomaly(True)         
+
         self.params = params
         self.state_size = state_size
         self.action_size = action_size
@@ -170,11 +173,13 @@ class D4PG_Agent():
         # Perform gradient ascent
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
+        # torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), 1)    # ADDED: Gradient Clipping to prevent exploding grad issue
         self.actor_optimizer.step()
 
         # Perform gradient descent
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
+        # torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)    # ADDED: Gradient Clipping to prevent exploding grad issue
         self.critic_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #

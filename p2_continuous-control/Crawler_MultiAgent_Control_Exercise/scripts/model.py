@@ -31,7 +31,11 @@ class Actor(nn.Module):
         self.fc2 = nn.Linear(params.hidden_sizes[0], params.hidden_sizes[1])
         self.bn2 = nn.BatchNorm1d(params.hidden_sizes[1])
         self.fc3 = nn.Linear(params.hidden_sizes[1], action_size)
-        self.reset_parameters()
+        if params.restart_training:
+            self.reset_parameters()
+
+        torch.autograd.set_detect_anomaly(True)         
+
 
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
@@ -74,7 +78,10 @@ class Critic(nn.Module):
         self.bn1 = nn.BatchNorm1d(params.hidden_sizes[0])
         self.fc2 = nn.Linear(params.hidden_sizes[0]+action_size, params.hidden_sizes[1])
         self.fc3 = nn.Linear(params.hidden_sizes[1], params.num_atoms)
-        self.reset_parameters()
+        if params.restart_training:
+            self.reset_parameters()
+
+        torch.autograd.set_detect_anomaly(True)         
 
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))

@@ -9,9 +9,9 @@ class Params():
         self.random_seed = 0                     # Random seed to start sim on
         self.n_episodes = 200                    # Number of episodes to run sim for
         self.max_t = 1000                        # Max sim step before episode terminates
-        self.print_every = 100                   # Prints every x episodes
+        self.print_every = 10                    # Prints every x episodes
         self.save_every = 100                    # Saves weights every x episodes
-        self.log_weights_every = 1              # How often to log weights in Tensorboard
+        self.log_weights_every = 10              # How often to log weights in Tensorboard
         self.terminate_on_target_score = False   # Terminates simulation upon reaching target score
         self.target_score = 1800                 # Target score to achieve before sim termination 
         self.prefill_memory_qty = 5000           # Experience (SARS) qty to prefill replay buffer before training
@@ -36,6 +36,11 @@ class Params():
         # Misc
         self.checkpoint_actor_weights_dir = 'weights/checkpoint_actor'
         self.checkpoint_critic_weights_dir = 'weights/checkpoint_critic'
+        self.restart_training = True
+        self.eps_to_resume_from = 224
+        self.actor_weights_filename_to_resume = 'checkpoint_actor_ep224.pth'
+        self.critic_weights_filename_to_resume = 'checkpoint_critic_ep224.pth'
+
 
         # D4PG STUFF
         # Lower and upper bounds of critic value output distribution, these will vary with environment
