@@ -32,14 +32,15 @@ class Params():
         self.soft_weights_update_every = 10      # how often to copy weights over to target networks (Gradually)
         self.hard_weights_update_every = 350     # how often to copy weights over to target networks (Instant)
         self.n_step_bootstrap = 5                # N-Step bootstrapping for Temporal Difference Update Calculations
+        self.gradient_clip = 0.25                # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
 
         # Misc
         self.checkpoint_actor_weights_dir = 'weights/checkpoint_actor'
         self.checkpoint_critic_weights_dir = 'weights/checkpoint_critic'
         self.restart_training = True
-        self.eps_to_resume_from = 224
-        self.actor_weights_filename_to_resume = 'checkpoint_actor_ep224.pth'
-        self.critic_weights_filename_to_resume = 'checkpoint_critic_ep224.pth'
+        self.eps_to_resume_from = 257
+        self.actor_weights_filename_to_resume = 'checkpoint_actor_ep257.pth'
+        self.critic_weights_filename_to_resume = 'checkpoint_critic_ep257.pth'
 
 
         # D4PG STUFF

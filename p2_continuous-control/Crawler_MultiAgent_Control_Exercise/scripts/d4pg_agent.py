@@ -173,13 +173,15 @@ class D4PG_Agent():
         # Perform gradient ascent
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
-        # torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), 1)    # ADDED: Gradient Clipping to prevent exploding grad issue
+        if self.params.gradient_clip != 0:
+            torch.nn.utils.clip_grad_norm_(self.actor_local.parameters(), self.params.gradient_clip)    # ADDED: Gradient Clipping to prevent exploding grad issue
         self.actor_optimizer.step()
 
         # Perform gradient descent
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
-        # torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), 1)    # ADDED: Gradient Clipping to prevent exploding grad issue
+        if self.params.gradient_clip != 0:
+            torch.nn.utils.clip_grad_norm_(self.critic_local.parameters(), self.params.gradient_clip)    # ADDED: Gradient Clipping to prevent exploding grad issue
         self.critic_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
