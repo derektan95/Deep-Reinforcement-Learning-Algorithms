@@ -21,8 +21,8 @@ class Params():
         # General Hyper-params
         self.buffer_size = int(3e5)              # replay buffer size
         self.batch_size = 128                    # minibatch size
-        self.hidden_sizes_actor=(256, 128)       # Hidden layer sizes (Actor Net)
-        self.hidden_sizes_critic=(256, 128)      # Hidden layer sizes (Critic Net)
+        self.hidden_sizes_actor=(512, 512, 512)  # Hidden layer sizes (Actor Net)
+        self.hidden_sizes_critic=(512, 512, 512) # Hidden layer sizes (Critic Net)
         self.gamma = 0.99                        # discount factor
         self.tau = 1e-3                          # for soft update of target parameters
         self.lr_actor = 5e-4                     # learning rate of the actor 

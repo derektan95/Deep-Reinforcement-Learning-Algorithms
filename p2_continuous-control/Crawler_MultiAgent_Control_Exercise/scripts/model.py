@@ -30,7 +30,9 @@ class Actor(nn.Module):
         self.bn1 = nn.BatchNorm1d(params.hidden_sizes_actor[0])
         self.fc2 = nn.Linear(params.hidden_sizes_actor[0], params.hidden_sizes_actor[1])
         self.bn2 = nn.BatchNorm1d(params.hidden_sizes_actor[1])
-        self.fc3 = nn.Linear(params.hidden_sizes_actor[1], action_size)
+        self.fc3 = nn.Linear(params.hidden_sizes_actor[1], params.hidden_sizes_actor[2])
+        self.bn3 = nn.BatchNorm1d(params.hidden_sizes_actor[2])
+        self.fc4 = nn.Linear(params.hidden_sizes_actor[2], action_size)
         if params.restart_training:
             self.reset_parameters()
 
@@ -52,7 +54,8 @@ class Actor(nn.Module):
         x = self.bn0(state)
         x = F.relu(self.bn1(self.fc1(x)))
         x = F.relu(self.bn2(self.fc2(x)))
-        x = torch.tanh(self.fc3(x))    # F.tanh is deperecated
+        x = F.relu(self.bn3(self.fc3(x)))
+        x = torch.tanh(self.fc4(x))    # F.tanh is deperecated
         return x.squeeze()             # Remove extra dimensions to output action list
 
 
@@ -77,11 +80,10 @@ class Critic(nn.Module):
         self.fc1 = nn.Linear(state_size, params.hidden_sizes_critic[0])
         self.bn1 = nn.BatchNorm1d(params.hidden_sizes_critic[0])
         self.fc2 = nn.Linear(params.hidden_sizes_critic[0]+action_size, params.hidden_sizes_critic[1])
-        self.fc3 = nn.Linear(params.hidden_sizes_critic[1], params.num_atoms)
+        self.fc3 = nn.Linear(params.hidden_sizes_critic[1], params.hidden_sizes_critic[2])
+        self.fc4 = nn.Linear(params.hidden_sizes_critic[2], params.num_atoms)
         if params.restart_training:
             self.reset_parameters()
-
-        # torch.autograd.set_detect_anomaly(True)         
 
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
@@ -94,13 +96,14 @@ class Critic(nn.Module):
         x = F.relu(self.bn1(self.fc1(x)))
         x = torch.cat((x, action), dim=1)
         x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
 
         # Only calculate the type of softmax needed by the foward call, to save
         # a modest amount of calculation across 1000s of timesteps.
         if log:
-            return F.log_softmax(self.fc3(x), dim=-1)
+            return F.log_softmax(self.fc4(x), dim=-1)
         else:
-            return F.softmax(self.fc3(x), dim=-1)
+            return F.softmax(self.fc4(x), dim=-1)
 
 class ActorCriticWrapper(nn.Module):
     """ A wrapper, purely for visualization of multiple graphs on Tensorboard"""
