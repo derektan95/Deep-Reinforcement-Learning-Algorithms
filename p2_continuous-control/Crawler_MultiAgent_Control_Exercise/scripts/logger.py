@@ -24,7 +24,7 @@ class Logger():
         self.t = 0
         self.tb = CustomSummaryWriter() 
 
-        torch.autograd.set_detect_anomaly(True)         
+        # torch.autograd.set_detect_anomaly(True)         
 
 
     def initialize(self, agent, state_size, action_size):
@@ -60,18 +60,20 @@ class Logger():
         self.tb.add_scalar("Actor Loss", actor_loss, episode)
         self.tb.add_scalar("Critic Loss", critic_loss, episode)
 
-        # # Track weights on Tensorboard every params.log_weights_every iters
-        # self.t = (self.t + 1) % self.params.log_weights_every
-        # if self.agent.actor_local is not None and self.t == 0:
-        #     for name, weight in self.agent.actor_local.named_parameters():
-        #         self.tb.add_histogram('Actor/'+name, weight, episode)
-        #         self.tb.add_histogram(f'Actor/{name}.grad',weight.grad, episode)
+        # Track weights on Tensorboard every params.log_weights_every iters
+        self.t = (self.t + 1) % self.params.log_weights_every
+        if self.agent.actor_local is not None and self.t == 0:
+            for name, weight in self.agent.actor_local.named_parameters():
+                self.tb.add_histogram('Actor/'+name, weight, episode)
+                self.tb.add_histogram(f'Actor/{name}.grad',weight.grad, episode)
 
-        # if self.agent.critic_local is not None and self.t == 0:        
-        #     for name, weight in self.agent.critic_local.named_parameters():
-        #         self.tb.add_histogram('Critic/'+name, weight, episode)
-        #         self.tb.add_histogram(f'Critic/{name}.grad',weight.grad, episode)   
+        if self.agent.critic_local is not None and self.t == 0:        
+            for name, weight in self.agent.critic_local.named_parameters():
+                self.tb.add_histogram('Critic/'+name, weight, episode)
+                self.tb.add_histogram(f'Critic/{name}.grad',weight.grad, episode)   
 
+        if self.agent is not None and self.t == 0:   
+            self.tb.add_histogram('Categorical Prob Ditribution', self.agent.categorical_probs, episode)
 
     def log_overall_perf_tb(self):
         """ Log overall performance of training cycle """
@@ -116,9 +118,18 @@ class Logger():
         axs[2].set_title('Critic Loss')
         plt.show()
 
+    def plot_categorical_probs(self):
+        fig = plt.figure()
+        plt.plot(np.arange(1, len(self.agent.categorical_probs)+1), self.agent.categorical_probs)
+        plt.ylabel('Projected probs')
+        plt.xlabel('Atom')
+        plt.show()
+
     def clear_weights(self):
-        shutil.rmtree(self.params.checkpoint_actor_weights_dir)
-        shutil.rmtree(self.params.checkpoint_critic_weights_dir)
+        if os.path.exists(self.params.checkpoint_actor_weights_dir):
+            shutil.rmtree(self.params.checkpoint_actor_weights_dir)
+        if os.path.exists(self.params.checkpoint_critic_weights_dir):
+            shutil.rmtree(self.params.checkpoint_critic_weights_dir)
         os.makedirs(self.params.checkpoint_actor_weights_dir)
         os.makedirs(self.params.checkpoint_critic_weights_dir)
 

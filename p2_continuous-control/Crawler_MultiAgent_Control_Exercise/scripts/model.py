@@ -26,15 +26,15 @@ class Actor(nn.Module):
         
         self.seed = torch.manual_seed(params.random_seed)
         self.bn0 = nn.BatchNorm1d(state_size)
-        self.fc1 = nn.Linear(state_size, params.hidden_sizes[0])
-        self.bn1 = nn.BatchNorm1d(params.hidden_sizes[0])
-        self.fc2 = nn.Linear(params.hidden_sizes[0], params.hidden_sizes[1])
-        self.bn2 = nn.BatchNorm1d(params.hidden_sizes[1])
-        self.fc3 = nn.Linear(params.hidden_sizes[1], action_size)
+        self.fc1 = nn.Linear(state_size, params.hidden_sizes_actor[0])
+        self.bn1 = nn.BatchNorm1d(params.hidden_sizes_actor[0])
+        self.fc2 = nn.Linear(params.hidden_sizes_actor[0], params.hidden_sizes_actor[1])
+        self.bn2 = nn.BatchNorm1d(params.hidden_sizes_actor[1])
+        self.fc3 = nn.Linear(params.hidden_sizes_actor[1], action_size)
         if params.restart_training:
             self.reset_parameters()
 
-        torch.autograd.set_detect_anomaly(True)         
+        # torch.autograd.set_detect_anomaly(True)         
 
 
     def reset_parameters(self):
@@ -74,14 +74,14 @@ class Critic(nn.Module):
         
         self.seed = torch.manual_seed(params.random_seed)
         self.bn0 = nn.BatchNorm1d(state_size)
-        self.fc1 = nn.Linear(state_size, params.hidden_sizes[0])
-        self.bn1 = nn.BatchNorm1d(params.hidden_sizes[0])
-        self.fc2 = nn.Linear(params.hidden_sizes[0]+action_size, params.hidden_sizes[1])
-        self.fc3 = nn.Linear(params.hidden_sizes[1], params.num_atoms)
+        self.fc1 = nn.Linear(state_size, params.hidden_sizes_critic[0])
+        self.bn1 = nn.BatchNorm1d(params.hidden_sizes_critic[0])
+        self.fc2 = nn.Linear(params.hidden_sizes_critic[0]+action_size, params.hidden_sizes_critic[1])
+        self.fc3 = nn.Linear(params.hidden_sizes_critic[1], params.num_atoms)
         if params.restart_training:
             self.reset_parameters()
 
-        torch.autograd.set_detect_anomaly(True)         
+        # torch.autograd.set_detect_anomaly(True)         
 
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))

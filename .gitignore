@@ -105,3 +105,5 @@ ENV/
 
 # IGNORE ALL TENSORBOARD RUN FILES
 runs/
+weights/checkpoint_actor
+weights/checkpoint_critic

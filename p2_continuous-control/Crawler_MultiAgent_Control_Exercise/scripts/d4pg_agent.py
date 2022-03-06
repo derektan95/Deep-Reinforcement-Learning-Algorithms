@@ -57,7 +57,7 @@ class D4PG_Agent():
             action_size (int): dimension of each action
         """
 
-        torch.autograd.set_detect_anomaly(True)         
+        # torch.autograd.set_detect_anomaly(True)         
 
         self.params = params
         self.state_size = state_size
@@ -68,20 +68,21 @@ class D4PG_Agent():
         # Actor Network (w/ Target Network)
         self.actor_local = Actor(state_size, action_size, self.params).to(self.device)
         self.actor_target = Actor(state_size, action_size, self.params).to(self.device)
-        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.params.lr_actor, weight_decay=self.params.weight_decay)
+        self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.params.lr_actor, weight_decay=self.params.weight_decay, eps=self.params.optimizer_eps)
 
         # Critic Network (w/ Target Network)
         self.critic_local = Critic(state_size, action_size, self.params).to(self.device)
         self.critic_target = Critic(state_size, action_size, self.params).to(self.device)
-        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.params.lr_critic, weight_decay=self.params.weight_decay)
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.params.lr_critic, weight_decay=self.params.weight_decay, eps=self.params.optimizer_eps)
 
         # Others
-        self.noise = OUNoise(action_size, self.params.random_seed)
+        self.noise = OUNoise(action_size, self.params.random_seed, theta=self.params.action_noise_theta, sigma=self.params.action_noise_sigma)
         self.memory = ReplayBuffer(action_size, self.params.buffer_size, self.params.batch_size, self.params.random_seed, params)
         self.t_step = 0
         self.learn_step = 0
         self.memory_prefilled_alerted = False
         self.atoms = torch.linspace(self.params.vmin, self.params.vmax, self.params.num_atoms).to(self.device)
+        self.categorical_probs = np.zeros((self.params.batch_size, self.params.num_atoms))
         
         # Outputs hyperparams
         self.print_init_messages(params)
@@ -122,7 +123,8 @@ class D4PG_Agent():
             action += self.noise.sample()
             # action += (0.3 * (np.random.normal(0, 1, action.shape)))   // SUGGESTED IN D4PG PAPER
                 
-        return np.clip(action, -1, 1)
+        #return np.clip(action, -1, 1)
+        return action
 
     def reset(self):
         self.noise.reset()
@@ -146,6 +148,7 @@ class D4PG_Agent():
         target_actions = self.actor_target(next_states)
         target_probs = self.critic_target(next_states, target_actions).detach()
         projected_target_probs = self.categorical_projection(rewards, target_probs, dones)
+        self.categorical_probs = projected_target_probs[0].cpu()  # STORE TO DEBUG
 
         # Calculate log probability DISTRIBUTION using Zw w.r.t. stored actions
         log_probs = self.critic_local(states, actions, log=True)

@@ -10,7 +10,7 @@ class Params():
         self.n_episodes = 200                    # Number of episodes to run sim for
         self.max_t = 1000                        # Max sim step before episode terminates
         self.print_every = 10                    # Prints every x episodes
-        self.save_every = 100                    # Saves weights every x episodes
+        self.save_every = 10                    # Saves weights every x episodes
         self.log_weights_every = 10              # How often to log weights in Tensorboard
         self.terminate_on_target_score = False   # Terminates simulation upon reaching target score
         self.target_score = 1800                 # Target score to achieve before sim termination 
@@ -21,7 +21,8 @@ class Params():
         # General Hyper-params
         self.buffer_size = int(3e5)              # replay buffer size
         self.batch_size = 128                    # minibatch size
-        self.hidden_sizes=(256, 128)             # Hidden layer sizes
+        self.hidden_sizes_actor=(256, 128)       # Hidden layer sizes (Actor Net)
+        self.hidden_sizes_critic=(256, 128)      # Hidden layer sizes (Critic Net)
         self.gamma = 0.99                        # discount factor
         self.tau = 1e-3                          # for soft update of target parameters
         self.lr_actor = 5e-4                     # learning rate of the actor 
@@ -32,7 +33,10 @@ class Params():
         self.soft_weights_update_every = 10      # how often to copy weights over to target networks (Gradually)
         self.hard_weights_update_every = 350     # how often to copy weights over to target networks (Instant)
         self.n_step_bootstrap = 5                # N-Step bootstrapping for Temporal Difference Update Calculations
-        self.gradient_clip = 0.25                # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
+        self.gradient_clip = 0                   # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
+        self.optimizer_eps = 1e-8                # Optimizer epsilon: Term added to denominator for numerical stability
+        self.action_noise_theta = 0.15           # Describes Ornstein-Uhlenbeck (OU) process noise
+        self.action_noise_sigma = 0.2            # Describes Ornstein-Uhlenbeck (OU) process noise
 
         # Misc
         self.checkpoint_actor_weights_dir = 'weights/checkpoint_actor'
@@ -52,6 +56,7 @@ class Params():
         self.num_atoms = 100                     # Multiple atoms can represent the distribution of V 
 
 
+    # If wanna print all local vars in class, consider 'pprint(vars(self))'
     def print_init_messages(self):
         
         # Print Hyper-parameters
@@ -60,7 +65,8 @@ class Params():
         print("RANDOM SEED: ", self.random_seed)
         print("BUFFER_SIZE: ", self.buffer_size)
         print("BATCH_SIZE: ", self.batch_size)
-        print("HIDDEN_SIZES: ", self.hidden_sizes)
+        print("HIDDEN_SIZES (ACTOR): ", self.hidden_sizes_actor)
+        print("HIDDEN_SIZES (CRITIC): ", self.hidden_sizes_critic)
         print("GAMMA: ", self.gamma)
         print("TAU: ", self.tau)
         print("LR_ACTOR: ", self.lr_actor)
