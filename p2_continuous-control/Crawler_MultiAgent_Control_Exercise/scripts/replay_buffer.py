@@ -27,6 +27,8 @@ class ReplayBuffer:
         
 
     # Save experiences in replay buffer (w/ N-Step Bootstrap)
+    # NOTE: if any robot is 'done', only selected robot will bootstrap till that specific step
+    # NOTE: This method is more precise, but don't think it differs too much compared to stopping bootstrapping for ALL robots (see commented below)
     def fill_nstep_buffer(self, experiences, clear_nstep_buffer=False):
         
         if clear_nstep_buffer:
@@ -36,13 +38,15 @@ class ReplayBuffer:
         if len(self.nstep_exp_buffer) >= self.params.n_step_bootstrap:
             
             num_robots = len(experiences[0])
-            discounted_future_rewards = [0] * num_robots
-            for i, exp in enumerate(self.nstep_exp_buffer):
-                discounted_future_rewards += ((self.params.gamma**i) * np.array(exp[2]))
-            
-            initial_exp = self.nstep_exp_buffer.popleft()
             for i in range(num_robots):
-                self.add(initial_exp[0][i], initial_exp[1][i], discounted_future_rewards[i], experiences[3][i], experiences[4][i])
+                discounted_future_rewards = 0
+                for j, exp in enumerate(self.nstep_exp_buffer):
+                    discounted_future_rewards += ((self.params.gamma**j) * exp[2][i])
+                    if exp[4][i]:    # DONE
+                        break
+
+                initial_exp = self.nstep_exp_buffer[0]
+                self.add(initial_exp[0][i], initial_exp[1][i], discounted_future_rewards, exp[3][i], exp[4][i])
 
     def add(self, state, action, reward, next_state, done):
         """Add a new experience to memory."""
@@ -64,3 +68,26 @@ class ReplayBuffer:
     def __len__(self):
         """Return the current size of internal memory."""
         return len(self.memory)
+
+
+
+# # Save experiences in replay buffer (w/ N-Step Bootstrap)
+# # NOTE: if any robot is 'done', all robots will bootstrap till that specific step
+# def fill_nstep_buffer(self, experiences, clear_nstep_buffer=False):
+    
+#     if clear_nstep_buffer:
+#         self.nstep_exp_buffer.clear()
+
+#     self.nstep_exp_buffer.append(experiences)
+#     if len(self.nstep_exp_buffer) >= self.params.n_step_bootstrap:
+        
+#         num_robots = len(experiences[0])
+#         discounted_future_rewards = [0] * num_robots
+#         for i, exp in enumerate(self.nstep_exp_buffer):
+#             discounted_future_rewards += ((self.params.gamma**i) * np.array(exp[2]))
+#             if any(exp[4]):  # done
+#                 break
+        
+#         initial_exp = self.nstep_exp_buffer.popleft()
+#         for i in range(num_robots):
+#             self.add(initial_exp[0][i], initial_exp[1][i], discounted_future_rewards[i], exp[3][i], exp[4][i])

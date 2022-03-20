@@ -73,7 +73,8 @@ class Logger():
                 self.tb.add_histogram(f'Critic/{name}.grad',weight.grad, episode)   
 
         if self.agent is not None and self.t == 0:   
-            self.tb.add_histogram('Categorical Prob Ditribution', self.agent.categorical_probs, episode)
+            self.tb.add_histogram('Predicted Prob Distribution', self.agent.predicted_probs, episode)
+            self.tb.add_histogram('Target Prob Distribution', self.agent.projected_target_probs, episode)
 
     def log_overall_perf_tb(self):
         """ Log overall performance of training cycle """
@@ -119,10 +120,18 @@ class Logger():
         plt.show()
 
     def plot_categorical_probs(self):
-        fig = plt.figure()
-        plt.plot(np.arange(1, len(self.agent.categorical_probs)+1), self.agent.categorical_probs)
-        plt.ylabel('Projected probs')
-        plt.xlabel('Atom')
+
+        _, axs = plt.subplots(1, 2, figsize=(20, 5))
+
+        # Predicted Probs`
+        axs[0].plot(np.arange(1, len(self.agent.predicted_probs)+1), self.agent.predicted_probs);
+        axs[0].set(xlabel='Atom #', ylabel='Predicted Probs')
+        axs[0].set_title('Predicted Q Probs')
+        
+        # Target Projected Probs
+        axs[1].plot(np.arange(1, len(self.agent.projected_target_probs)+1), self.agent.projected_target_probs);
+        axs[1].set(xlabel='Atom #', ylabel='Target Probs')
+        axs[1].set_title('Projected Target Q Probs')
         plt.show()
 
     def clear_weights(self):

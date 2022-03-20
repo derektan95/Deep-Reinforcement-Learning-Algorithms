@@ -82,8 +82,9 @@ class D4PG_Agent():
         self.learn_step = 0
         self.memory_prefilled_alerted = False
         self.atoms = torch.linspace(self.params.vmin, self.params.vmax, self.params.num_atoms).to(self.device)
-        self.categorical_probs = np.zeros((self.params.batch_size, self.params.num_atoms))
-        
+        self.predicted_probs = np.zeros((self.params.batch_size, self.params.num_atoms))
+        self.projected_target_probs = np.zeros((self.params.batch_size, self.params.num_atoms))
+
         # Outputs hyperparams
         self.print_init_messages(params)
     
@@ -148,10 +149,13 @@ class D4PG_Agent():
         target_actions = self.actor_target(next_states)
         target_probs = self.critic_target(next_states, target_actions).detach()
         projected_target_probs = self.categorical_projection(rewards, target_probs, dones)
-        self.categorical_probs = projected_target_probs[0].cpu()  # STORE TO DEBUG
 
         # Calculate log probability DISTRIBUTION using Zw w.r.t. stored actions
         log_probs = self.critic_local(states, actions, log=True)
+
+        # Storage for visualization later
+        self.projected_target_probs = projected_target_probs[0].clone().cpu().detach()
+        self.predicted_probs = log_probs[0].clone().exp().cpu().detach()  # STORE TO DEBUG
 
         # Calculate the critic network LOSS (Cross Entropy), CE-loss is ideal
         # for categorical value distributions as utilized in D4PG.
