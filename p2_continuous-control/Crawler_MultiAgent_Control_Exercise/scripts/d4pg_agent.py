@@ -143,12 +143,11 @@ class D4PG_Agent():
         # Already calculated before storing in the replay buffer.
         # NEXT_STATES are ROLLOUT steps ahead of STATES
         atoms = self.atoms.unsqueeze(0)
+
         # Calculate Yᵢ from target networks using πθ' and Zw'
         # These tensors are not needed for backpropogation, so detach from the
         # calculation graph (literally doubles runtime if this is not detached)
-        target_actions = self.actor_target(next_states)
-        target_probs = self.critic_target(next_states, target_actions).detach()
-        projected_target_probs = self.categorical_projection(rewards, target_probs, dones)
+        projected_target_probs = self.get_projected_critic_target(rewards, next_states, dones).detach()
 
         # Calculate log probability DISTRIBUTION using Zw w.r.t. stored actions
         log_probs = self.critic_local(states, actions, log=True)
@@ -232,16 +231,16 @@ class D4PG_Agent():
 
         target_model.load_state_dict(local_model.state_dict())
 
-    # def get_projected_critic_target(self, rewards, next_states):
-    #     """
-    #     Calculate Yᵢ from target networks using πθ' and Zw'
-    #     """
+    def get_projected_critic_target(self, rewards, next_states, dones):
+        """
+        Calculate Yᵢ from target networks using πθ' and Zw'
+        """
 
-    #     target_actions = self.actor_target(next_states)
-    #     target_probs = self.critic_target(next_states, target_actions)
-    #     # Project the categorical distribution onto the supports
-    #     projected_probs = self.categorical_projection(rewards, target_probs)
-    #     return projected_probs
+        target_actions = self.actor_target(next_states)
+        target_probs = self.critic_target(next_states, target_actions)
+        # Project the categorical distribution onto the supports
+        projected_probs = self.categorical_projection(rewards, target_probs, dones)
+        return projected_probs
 
     def categorical_projection(self, rewards, probs, dones):
         """

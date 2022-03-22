@@ -42,7 +42,8 @@ class Actor(nn.Module):
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
         self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
-        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
+        self.fc3.weight.data.uniform_(*hidden_init(self.fc3))
+        self.fc4.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state):
         """Build an actor (policy) network that maps states -> actions."""
@@ -52,9 +53,9 @@ class Actor(nn.Module):
             state = state.unsqueeze(0)
 
         x = self.bn0(state)
-        x = F.relu(self.bn1(self.fc1(x)))
-        x = F.relu(self.bn2(self.fc2(x)))
-        x = F.relu(self.bn3(self.fc3(x)))
+        x = F.leaky_relu(self.bn1(self.fc1(x)))
+        x = F.leaky_relu(self.bn2(self.fc2(x)))
+        x = F.leaky_relu(self.bn3(self.fc3(x)))
         x = torch.tanh(self.fc4(x))    # F.tanh is deperecated
         return x.squeeze()             # Remove extra dimensions to output action list
 
@@ -88,15 +89,16 @@ class Critic(nn.Module):
     def reset_parameters(self):
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
         self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
-        self.fc3.weight.data.uniform_(-3e-3, 3e-3)
+        self.fc3.weight.data.uniform_(*hidden_init(self.fc3))
+        self.fc4.weight.data.uniform_(-3e-3, 3e-3)
 
     def forward(self, state, action, log=False):
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
         x = self.bn0(state)
-        x = F.relu(self.bn1(self.fc1(x)))
+        x = F.leaky_relu(self.bn1(self.fc1(x)))
         x = torch.cat((x, action), dim=1)
-        x = F.relu(self.fc2(x))
-        x = F.relu(self.fc3(x))
+        x = F.leaky_relu(self.fc2(x))
+        x = F.leaky_relu(self.fc3(x))
 
         # Only calculate the type of softmax needed by the foward call, to save
         # a modest amount of calculation across 1000s of timesteps.
