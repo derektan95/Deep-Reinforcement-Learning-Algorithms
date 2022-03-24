@@ -32,18 +32,15 @@ class Logger():
 
         self.agent = agent
         if not self.params.restart_training:
-            agent.actor_local.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_actor_weights_dir, self.params.actor_weights_filename_to_resume)))
-            agent.critic_local.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_critic_weights_dir, self.params.critic_weights_filename_to_resume)))
-            agent.actor_target.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_actor_weights_dir, self.params.actor_weights_filename_to_resume)))
-            agent.critic_target.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_critic_weights_dir, self.params.critic_weights_filename_to_resume)))
+            agent.actor_net.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_actor_weights_dir, self.params.actor_weights_filename_to_resume)))
+            agent.critic_net.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_critic_weights_dir, self.params.critic_weights_filename_to_resume)))
         else:
             self.clear_weights()
 
         # Initialize network wrapper for model visualization on TensorBoard
         wrapper_net = ActorCriticWrapper(state_size, action_size, self.params)
         self.tb.add_graph(wrapper_net, 
-                          (torch.zeros(state_size).unsqueeze(0).to(self.params.device), 
-                          torch.zeros(action_size).unsqueeze(0).to(self.params.device)))
+                          (torch.zeros(state_size).unsqueeze(0).to(self.params.device)))
 
     def log_stats(self, episode, score, actor_loss, critic_loss):
         """ Log stats onto Tensorboard on every interations """
@@ -62,18 +59,15 @@ class Logger():
 
         # Track weights on Tensorboard every params.log_weights_every iters
         self.t = (self.t + 1) % self.params.log_weights_every
-        if self.agent.actor_local is not None and self.t == 0:
-            for name, weight in self.agent.actor_local.named_parameters():
+        if self.agent.actor_net is not None and self.t == 0:
+            for name, weight in self.agent.actor_net.named_parameters():
                 self.tb.add_histogram('Actor/'+name, weight, episode)
                 self.tb.add_histogram(f'Actor/{name}.grad',weight.grad, episode)
 
-        if self.agent.critic_local is not None and self.t == 0:        
-            for name, weight in self.agent.critic_local.named_parameters():
+        if self.agent.critic_net is not None and self.t == 0:        
+            for name, weight in self.agent.critic_net.named_parameters():
                 self.tb.add_histogram('Critic/'+name, weight, episode)
                 self.tb.add_histogram(f'Critic/{name}.grad',weight.grad, episode)   
-
-        if self.agent is not None and self.t == 0:   
-            self.tb.add_histogram('Categorical Prob Ditribution', self.agent.categorical_probs, episode)
 
     def log_overall_perf_tb(self):
         """ Log overall performance of training cycle """
@@ -90,10 +84,10 @@ class Logger():
 
     def print_weights(self):
         print("\n====== ACTOR WEIGHTS ===== \n")
-        for name, weight in self.agent.actor_local.named_parameters():
+        for name, weight in self.agent.actor_net.named_parameters():
             print('Actor/'+name, weight)
         print("\n====== CRITIC WEIGHTS ===== \n")
-        for name, weight in self.agent.critic_local.named_parameters():
+        for name, weight in self.agent.critic_net.named_parameters():
             print('Critic/'+name, weight)       
 
 
@@ -118,13 +112,6 @@ class Logger():
         axs[2].set_title('Critic Loss')
         plt.show()
 
-    def plot_categorical_probs(self):
-        fig = plt.figure()
-        plt.plot(np.arange(1, len(self.agent.categorical_probs)+1), self.agent.categorical_probs)
-        plt.ylabel('Projected probs')
-        plt.xlabel('Atom')
-        plt.show()
-
     def clear_weights(self):
         if os.path.exists(self.params.checkpoint_actor_weights_dir):
             shutil.rmtree(self.params.checkpoint_actor_weights_dir)
@@ -134,8 +121,8 @@ class Logger():
         os.makedirs(self.params.checkpoint_critic_weights_dir)
 
     def save_weights(self, episode):
-        torch.save(self.agent.actor_local.state_dict(), "{}/checkpoint_actor_ep{}.pth".format(self.params.checkpoint_actor_weights_dir, episode))
-        torch.save(self.agent.critic_local.state_dict(), "{}/checkpoint_critic_ep{}.pth".format(self.params.checkpoint_critic_weights_dir, episode))
+        torch.save(self.agent.actor_net.state_dict(), "{}/checkpoint_actor_ep{}.pth".format(self.params.checkpoint_actor_weights_dir, episode))
+        torch.save(self.agent.critic_net.state_dict(), "{}/checkpoint_critic_ep{}.pth".format(self.params.checkpoint_critic_weights_dir, episode))
 
 
 ####################################################
@@ -143,7 +130,7 @@ class Logger():
 # https://github.com/lanpa/tensorboardX/issues/319 #
 ####################################################
 
-# self.tb.add_graph(agent.actor_local, torch.zeros(state_size).to(self.params.device))
-# self.tb.add_graph(agent.critic_local,
+# self.tb.add_graph(agent.actor_net, torch.zeros(state_size).to(self.params.device))
+# self.tb.add_graph(agent.critic_net,
                 #   (torch.zeros(state_size).unsqueeze(0).to(self.params.device),
                 #   torch.zeros(action_size).unsqueeze(0).to(self.params.device)))
