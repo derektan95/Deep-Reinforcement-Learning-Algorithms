@@ -91,9 +91,10 @@ class Logger():
             print('Critic/'+name, weight)       
 
 
-    def plot_stats(self):
+    def plot_stats(self, label):
         """ Plots stats recorded """
 
+        print("\n=====", label, "=====")
         _, axs = plt.subplots(1, 3, figsize=(20, 5))
 
         # Scores

@@ -6,14 +6,14 @@ class Params():
     def __init__(self):
 
         # Simulation Based Params
-        self.random_seed = 0                     # Random seed to start sim on
+        self.random_seed = 1                     # Random seed to start sim on
         self.n_episodes = 500                    # Number of episodes to run sim for
         self.max_t = 600                         # Max sim step before episode terminates
         self.print_every = 10                    # Prints every x episodes
         self.save_every = 10                     # Saves weights every x episodes
         self.log_weights_every = 10              # How often to log weights in Tensorboard
         self.terminate_on_target_score = False   # Terminates simulation upon reaching target score
-        self.target_score = 100                  # Target score to achieve before sim termination 
+        self.target_score = 110                  # Target score to achieve before sim termination 
         self.prefill_memory_qty = 0              # Experience (SARS) qty to prefill replay buffer before training
         self.verbose = False                     # Whether to print debug messages
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -28,7 +28,7 @@ class Params():
         self.eps = 0.1                           # How much to clip advantage function
         self.eps_decay = 1                       # How fast to tighten the clipping function
         self.beta = 0.001                        # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
-        self.beta_decay = 1                      # How fast to reduce added entropy (Exploitation Rate)
+        self.beta_decay = 0.995                  # How fast to reduce added entropy (Exploitation Rate)
         self.weight_decay = 0                    # L2 weight decay          (ORIGINAL: 0)
         self.n_step_bootstrap = 1                # N-Step bootstrapping for Temporal Difference Update Calculations
         self.gradient_clip = 0                   # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop

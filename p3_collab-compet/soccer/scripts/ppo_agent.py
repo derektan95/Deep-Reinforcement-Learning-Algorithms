@@ -76,7 +76,7 @@ class PPO_Agent():
         discount = self.params.gamma**np.arange(len(rewards))
         rewards = np.asarray(rewards)*discount[:,np.newaxis]
         rewards_future = rewards[::-1].cumsum(axis=0)[::-1] 
-
+    
         # normalize advantage function
         self.critic_net.eval()
         with torch.no_grad():
@@ -104,7 +104,7 @@ class PPO_Agent():
             # Policy Loss (PPO)
             _, cur_log_probs, entropies = self.actor_net(sampled_states, sampled_actions)
             ppo_ratio = (cur_log_probs.unsqueeze(1) - sampled_log_probs).exp()
-            clip = torch.clip(ppo_ratio, 1 - self.params.eps,  1 + self.params.eps)
+            clip = torch.clamp(ppo_ratio, 1 - self.params.eps,  1 + self.params.eps)
             policy_loss = -torch.min(ppo_ratio * sampled_advantages, clip * sampled_advantages).mean()
 
             # Critic Loss (MSE)
