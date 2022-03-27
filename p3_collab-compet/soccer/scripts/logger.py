@@ -9,11 +9,12 @@ from params import Params
 from model import ActorCriticWrapper
 
 class Logger():
-    """Simple Logger class to store stats for printing & Tensorboard Visualization """
+    """Generic Logger class to store stats for printing & Tensorboard Visualization """
 
-    def __init__(self, params=Params()):
+    def __init__(self, params=Params(), tb=CustomSummaryWriter(), agent_ns=""):
 
         self.params = params
+        self.agent_ns = agent_ns    # Agent's Namespace
         self.scores_list = []
         self.actor_loss_list = []
         self.critic_loss_list = []
@@ -22,7 +23,7 @@ class Logger():
         self.critic_loss_deque = deque(maxlen=params.print_every)
         self.hparam_dict = params.get_hparam_dict()
         self.t = 0
-        self.tb = CustomSummaryWriter() 
+        self.tb = tb
 
         # torch.autograd.set_detect_anomaly(True)         
 
@@ -53,30 +54,30 @@ class Logger():
         self.critic_loss_list.append(critic_loss)
 
         # Tensorboard Logging
-        self.tb.add_scalar("Reward", score, episode)
-        self.tb.add_scalar("Actor Loss", actor_loss, episode)
-        self.tb.add_scalar("Critic Loss", critic_loss, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Reward", score, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Actor Loss", actor_loss, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Critic Loss", critic_loss, episode)
 
         # Track weights on Tensorboard every params.log_weights_every iters
         self.t = (self.t + 1) % self.params.log_weights_every
         if self.agent.actor_net is not None and self.t == 0:
             for name, weight in self.agent.actor_net.named_parameters():
-                self.tb.add_histogram('Actor/'+name, weight, episode)
-                self.tb.add_histogram(f'Actor/{name}.grad',weight.grad, episode)
+                self.tb.add_histogram(f'{self.agent_ns}/Actor/'+name, weight, episode)
+                self.tb.add_histogram(f'{self.agent_ns}/Actor/{name}.grad',weight.grad, episode)
 
         if self.agent.critic_net is not None and self.t == 0:        
             for name, weight in self.agent.critic_net.named_parameters():
-                self.tb.add_histogram('Critic/'+name, weight, episode)
-                self.tb.add_histogram(f'Critic/{name}.grad',weight.grad, episode)   
+                self.tb.add_histogram(f'{self.agent_ns}/Critic/'+name, weight, episode)
+                self.tb.add_histogram(f'{self.agent_ns}/Critic/{name}.grad',weight.grad, episode)   
 
     def log_overall_perf_tb(self):
         """ Log overall performance of training cycle """
 
         self.tb.add_hparams(self.hparam_dict,
             {
-                "Reward": np.mean(self.scores_deque),
-                "Actor Loss": np.mean(self.actor_loss_deque),
-                "Critic Loss": np.mean(self.critic_loss_deque),
+                f"{self.agent_ns}/Reward": np.mean(self.scores_deque),
+                f"{self.agent_ns}/Actor Loss": np.mean(self.actor_loss_deque),
+                f"{self.agent_ns}/Critic Loss": np.mean(self.critic_loss_deque),
             },
         )
         self.tb.close()
@@ -85,32 +86,32 @@ class Logger():
     def print_weights(self):
         print("\n====== ACTOR WEIGHTS ===== \n")
         for name, weight in self.agent.actor_net.named_parameters():
-            print('Actor/'+name, weight)
+            print(f'{self.agent_ns}/Actor/'+name, weight)
         print("\n====== CRITIC WEIGHTS ===== \n")
         for name, weight in self.agent.critic_net.named_parameters():
-            print('Critic/'+name, weight)       
+            print(f'{self.agent_ns}/Critic/'+name, weight)       
 
 
-    def plot_stats(self, label):
+    def plot_stats(self):
         """ Plots stats recorded """
 
-        print("\n=====", label, "=====")
+        print("=====", self.agent_ns, "=====")
         _, axs = plt.subplots(1, 3, figsize=(20, 5))
 
         # Scores
         axs[0].plot(np.arange(1, len(self.scores_list)+1), self.scores_list)
         axs[0].set(xlabel='Episode #', ylabel='Score')
-        axs[0].set_title('Rewards')
+        axs[0].set_title(f'{self.agent_ns}/Rewards')
         
         # Actor Loss
         axs[1].plot(np.arange(1, len(self.actor_loss_list)+1), self.actor_loss_list)
         axs[1].set(xlabel='Episode #', ylabel='Loss')
-        axs[1].set_title('Actor Loss')
+        axs[1].set_title(f'{self.agent_ns}/Actor Loss')
     
         # Critic Loss
         axs[2].plot(np.arange(1, len(self.critic_loss_list)+1), self.critic_loss_list)
         axs[2].set(xlabel='Episode #', ylabel='Loss')
-        axs[2].set_title('Critic Loss')
+        axs[2].set_title(f'{self.agent_ns}/Critic Loss')
         plt.show()
 
     def clear_weights(self):
