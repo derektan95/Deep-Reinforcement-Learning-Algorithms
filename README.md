@@ -1,4 +1,4 @@
-# Deep Reinforcement Learning Nanodegree (Udacity)
+# Deep Reinforcement Learning Algorithms
 
 **Disclaimer:** Udacity provided some starter code, but the implementation for these concepts are done by myself. Please contact derektan95@hotmail.com for any questions. <br><br>
 **Note:** Please refer to the instructions on how to download the dependencies for these projects [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/INSTRUCTIONS.md).
