@@ -37,6 +37,12 @@ This project focuses on the use of **Deep Deterministic Policy Gradient (DDPG)**
   <img src="p2_continuous-control/media/ddpg_reward_episode_graph.png" width="400" height="250" />
 </p>
 
+In addition, the **Distributed Distributional Deterministic Policy Gradients ([D4PG](https://arxiv.org/pdf/1804.08617.pdf))** method was introduced into a multi-arm simulation environment. D4PG utilizes distributional value estimation, n-step returns, prioritized experience replay (PER), distributed K-actor exploration for fast and stable learning. Implementation of PER is omitted as the original paper suggests its lack of efficacy in training speed or stability. 
+<p align="center">
+  <img src="p2_continuous-control/media/D4PG_MultiArm_ContinuousControl.gif" width="350" height="250" />
+  <img src="p2_continuous-control/media/D4PG_MultiArm_ContinuousControl_learning_curve_resized.png" width="325" height="250" />
+</p>
+
 ## Multi-Agent Deep Deterministic Policy Gradient for Cooperative Tennis <br/>
 
 This project focuses on the use of **Multi-Agent Deep Deterministic Policy Gradient (MADDPG)** to train 2 tennis bats to cooperate with each other in keeping the ball midair for as long as possible. Here are more information on the [training algorithm](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/tree/master/p3_collab-compet) and [project instructions](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/INSTRUCTIONS.md).
