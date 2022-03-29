@@ -46,6 +46,9 @@ class PPO_Agent():
         self.actor_loss = 0
         self.critic_loss = 0
 
+    def clear_memory_buffer(self):
+        self.memory.clear()
+
     def step(self, states, all_states, actions, rewards, log_probs):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         
@@ -123,11 +126,12 @@ class PPO_Agent():
                 torch.nn.utils.clip_grad_norm_(self.critic_net.parameters(), self.params.gradient_clip)   # ADDED: Gradient Clipping to prevent exploding grad issue
             self.optimizer.step()
 
-        # Record losses & decay params
+        # Post-processing
         self.actor_loss = policy_loss.item()
         self.critic_loss = critic_loss.item()
         self.params.eps *= self.params.eps_decay
         self.params.beta *= self.params.beta_decay
+        self.clear_memory_buffer()
 
    
     def print_init_messages(self):

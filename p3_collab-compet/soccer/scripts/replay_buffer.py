@@ -26,7 +26,11 @@ class ReplayBuffer:
         """Add a new experience to memory."""
         e = self.experience(states, all_states, actions, rewards, log_probs)
         self.memory.append(e)
-    
+
+    def clear(self):
+       """Deletes all experiences from the replay buffer."""
+       self.memory.clear()
+
     def sample(self):
         """Randomly sample a batch of experiences from memory."""
 
