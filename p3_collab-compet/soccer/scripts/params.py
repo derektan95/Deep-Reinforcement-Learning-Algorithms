@@ -22,8 +22,7 @@ class Params():
         self.batch_size = 32                     # minibatch size
         self.hidden_sizes_actor=(256, 128)       # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(256, 128)      # Hidden layer sizes (Critic Net)
-        self.lr_actor = 8e-5                     # learning rate of the actor 
-        self.lr_critic = 8e-5                    # learning rate of the critic
+        self.lr = 8e-5                           # learning rate of the actor 
         self.gamma = 0.995                       # discount factor
         self.eps = 0.1                           # How much to clip advantage function
         self.eps_decay = 1                       # How fast to tighten the clipping function
@@ -31,7 +30,7 @@ class Params():
         self.beta_decay = 0.995                  # How fast to reduce added entropy (Exploitation Rate)
         self.weight_decay = 0                    # L2 weight decay          (ORIGINAL: 0)
         self.n_step_bootstrap = 1                # N-Step bootstrapping for Temporal Difference Update Calculations
-        self.gradient_clip = 0                   # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
+        self.gradient_clip = int(0)              # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
         self.optimizer_eps = 1e-8                # Optimizer epsilon: Term added to denominator for numerical stability
 
         # Misc
@@ -55,8 +54,7 @@ class Params():
         print("BATCH_SIZE: ", self.batch_size)
         print("HIDDEN_SIZES (ACTOR): ", self.hidden_sizes_actor)
         print("HIDDEN_SIZES (CRITIC): ", self.hidden_sizes_critic)
-        print("LR_ACTOR: ", self.lr_actor)
-        print("LR_CRITIC: ", self.lr_critic)
+        print("LR (Joint): ", self.lr)
         print("GAMMA: ", self.gamma)
         print("BETA: ", self.beta)
         print("BETA_DECAY: ", self.beta_decay)
@@ -68,7 +66,7 @@ class Params():
 
     def get_hparam_dict(self):
         """ For tensorboard tracking of impt hyper-params. """
-        hparam_dict = {"batch_size": self.batch_size, "actor_lr": self.lr_actor, "critic_lr": self.lr_critic,
+        hparam_dict = {"batch_size": self.batch_size, "lr": self.lr,
                        "gamma": self.gamma, "beta": self.beta, "beta_decay": self.beta_decay, "eps": self.eps, 
                        "eps_decay": self.eps_decay}
 

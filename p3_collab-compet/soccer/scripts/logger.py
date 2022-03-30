@@ -18,6 +18,7 @@ class Logger():
         self.scores_list = []
         self.actor_loss_list = []
         self.critic_loss_list = []
+        self.entropy_loss_list = []
         self.scores_deque = deque(maxlen=params.print_every)
         self.actor_loss_deque = deque(maxlen=params.print_every)
         self.critic_loss_deque = deque(maxlen=params.print_every)
@@ -43,7 +44,7 @@ class Logger():
         self.tb.add_graph(wrapper_net, 
                           (torch.zeros(state_size).unsqueeze(0).to(self.params.device)))
 
-    def log_stats(self, episode, score, actor_loss, critic_loss):
+    def log_stats(self, episode, score, actor_loss, critic_loss, entropy_loss):
         """ Log stats onto Tensorboard on every interations """
 
         self.scores_deque.append(score)
@@ -52,11 +53,13 @@ class Logger():
         self.scores_list.append(score)
         self.actor_loss_list.append(actor_loss)
         self.critic_loss_list.append(critic_loss)
+        self.entropy_loss_list.append(entropy_loss)
 
         # Tensorboard Logging
         self.tb.add_scalar(f"{self.agent_ns}/Reward", score, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Actor Loss", actor_loss, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Critic Loss", critic_loss, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Entropy Loss", entropy_loss, episode)
 
         # Track weights on Tensorboard every params.log_weights_every iters
         self.t = (self.t + 1) % self.params.log_weights_every

@@ -65,7 +65,7 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, params):
+    def __init__(self, state_size, params):
         """Initialize parameters and build model.
         NOTE: Centralized critic, hence state includes combination of all states from all 4 agents.
 
