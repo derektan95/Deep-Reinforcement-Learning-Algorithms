@@ -61,7 +61,10 @@ class Logger():
         self.tb.add_scalar(f"{self.agent_ns}/Critic Loss", critic_loss, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Entropy Loss", entropy_loss, episode)
 
-        # Track weights on Tensorboard every params.log_weights_every iters
+
+    def log_weights(self, episode):
+        """ Log weights on Tensorboard every params.log_weights_every iters   """
+
         self.t = (self.t + 1) % self.params.log_weights_every
         if self.agent.actor_net is not None and self.t == 0:
             for name, weight in self.agent.actor_net.named_parameters():
@@ -71,7 +74,8 @@ class Logger():
         if self.agent.critic_net is not None and self.t == 0:        
             for name, weight in self.agent.critic_net.named_parameters():
                 self.tb.add_histogram(f'{self.agent_ns}/Critic/'+name, weight, episode)
-                self.tb.add_histogram(f'{self.agent_ns}/Critic/{name}.grad',weight.grad, episode)   
+                self.tb.add_histogram(f'{self.agent_ns}/Critic/{name}.grad',weight.grad, episode)
+
 
     def log_overall_perf_tb(self):
         """ Log overall performance of training cycle """

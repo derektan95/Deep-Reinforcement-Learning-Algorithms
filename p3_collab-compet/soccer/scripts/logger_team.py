@@ -15,10 +15,10 @@ class Logger_Team():
 
         self.params = params
         self.agent_ns = agent_ns    # Agent's Namespace
-        self.scores_list = []
+        self.scores_cum_list = []
         self.scores_deque = deque(maxlen=100)
         self.scores_cum_deque = deque(maxlen=100)
-        self.scores_opp_list = []
+        self.scores_cum_opp_list = []
         self.scores_opp_deque = deque(maxlen=100)
         self.scores_opp_cum_deque = deque(maxlen=100)
         self.wins_deque = deque(maxlen=100)
@@ -52,11 +52,11 @@ class Logger_Team():
     def log_stats(self, episode, team_score, opponent_score):
         """ Log stats onto Tensorboard on every interations """
 
-        self.scores_list.append(team_score)
         self.scores_deque.append(team_score)
+        self.scores_cum_list.append(sum(self.scores_deque))
         self.scores_cum_deque.append(sum(self.scores_deque))
         self.scores_opp_deque.append(opponent_score)
-        self.scores_opp_list.append(opponent_score)
+        self.scores_cum_opp_list.append(sum(self.scores_opp_deque))
         self.scores_opp_cum_deque.append(sum(self.scores_opp_deque))
 
         self.wins_deque.append(int(1 if team_score > opponent_score else 0))
@@ -95,14 +95,14 @@ class Logger_Team():
         _, axs = plt.subplots(2, 3, figsize=(30, 10))
 
         # Team Scores
-        axs[0,0].plot(np.arange(1, len(self.scores_cum_deque)+1), self.scores_cum_deque)
+        axs[0,0].plot(np.arange(1, len(self.scores_cum_list)+1), self.scores_cum_list)
         axs[0,0].set(xlabel='Episode #', ylabel='Score')
-        axs[0,0].set_title(f'{self.agent_ns}/Score [{len(self.scores_cum_deque)} Matches]')
+        axs[0,0].set_title(f'{self.agent_ns}/Score')
 
         # Opponent Scores
-        axs[0,1].plot(np.arange(1, len(self.scores_opp_cum_deque)+1), self.scores_opp_cum_deque)
+        axs[0,1].plot(np.arange(1, len(self.scores_cum_opp_list)+1), self.scores_cum_opp_list)
         axs[0,1].set(xlabel='Episode #', ylabel='Score')
-        axs[0,1].set_title(f'Opponent/Score [{len(self.scores_opp_cum_deque)} Matches]')
+        axs[0,1].set_title(f'Opponent/Score')
 
         # Wins
         axs[0,2].plot(np.arange(1, len(self.wins_cum_deque)+1), self.wins_cum_deque)

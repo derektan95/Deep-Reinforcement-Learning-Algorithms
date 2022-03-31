@@ -47,9 +47,11 @@ class Actor(nn.Module):
     def forward(self, state, action=None):
         """Build an actor (policy) network that maps states -> actions."""
 
+
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
         x = F.softmax(self.fc3(x), dim=1)
+
 
         dist = distributions.Categorical(x)
 
@@ -57,7 +59,7 @@ class Actor(nn.Module):
             action = dist.sample()
 
         # Squeeze to output (batch_size, 1) instead of (batch_size, batch_size) during training
-        log_prob = dist.log_prob(action.squeeze())  
+        log_prob = dist.log_prob(action)  
 
         return action, log_prob, dist.entropy()
 
@@ -107,7 +109,7 @@ class ActorCriticWrapper(nn.Module):
 
         # build policy and value functions
         self.actor = Actor(state_size, action_size, params).to(params.device)
-        self.critic = Critic(state_size, action_size, params).to(params.device)
+        self.critic = Critic(state_size, params).to(params.device)
 
     def forward(self, state):
 

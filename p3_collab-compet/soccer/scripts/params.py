@@ -9,13 +9,14 @@ class Params():
         self.random_seed = 1                     # Random seed to start sim on
         self.n_episodes = 500                    # Number of episodes to run sim for
         self.max_t = 600                         # Max sim step before episode terminates
-        self.print_every = 10                    # Prints every x episodes
-        self.save_every = 10                     # Saves weights every x episodes
-        self.log_weights_every = 10              # How often to log weights in Tensorboard
-        self.terminate_on_target_score = False   # Terminates simulation upon reaching target score
-        self.target_score = 110                  # Target score to achieve before sim termination 
+        self.print_every = 20                    # Prints every x episodes
+        self.save_every = 20                     # Saves weights every x episodes
+        self.log_weights_every = 20              # How often to log weights in Tensorboard
+        self.plot_stats = True                   # Plot graphs from loggers?
+        self.terminate_on_target_score = True    # Terminates simulation upon reaching target score
+        self.target_score = 110.0                # Target score to achieve before sim termination 
         self.prefill_memory_qty = 0              # Experience (SARS) qty to prefill replay buffer before training
-        self.verbose = False                     # Whether to print debug messages
+        self.verbose = True                      # Whether to print debug messages
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
@@ -38,10 +39,10 @@ class Params():
         self.checkpoint_critic_weights_dir = 'weights/checkpoint_critic'
         self.restart_training = True
 
-        # Restart training params (if restart training is false)
-        self.eps_to_resume_from = 257
-        self.actor_weights_filename_to_resume = 'checkpoint_actor_ep257.pth'
-        self.critic_weights_filename_to_resume = 'checkpoint_critic_ep257.pth'
+        # # Restart training params (if restart training is false)
+        # self.eps_to_resume_from = 257
+        # self.actor_weights_filename_to_resume = 'checkpoint_actor_ep257.pth'
+        # self.critic_weights_filename_to_resume = 'checkpoint_critic_ep257.pth'
 
 
     # If wanna print all local vars in class, consider 'pprint(vars(self))'

@@ -34,11 +34,11 @@ class ReplayBuffer:
     def sample(self):
         """Randomly sample a batch of experiences from memory."""
 
-        states = torch.from_numpy(np.vstack([e.state for e in self.memory if e is not None])).float().to(self.device)
-        all_states = torch.from_numpy(np.vstack([e.all_state for e in self.memory if e is not None])).float().to(self.device)
-        actions = torch.from_numpy(np.vstack([e.action for e in self.memory if e is not None])).float().to(self.device)
-        rewards = torch.from_numpy(np.vstack([e.reward for e in self.memory if e is not None])).float().to(self.device)
-        log_probs = torch.from_numpy(np.vstack([e.log_prob for e in self.memory if e is not None])).float().to(self.device)
+        states = np.vstack([e.state for e in self.memory if e is not None])
+        all_states = np.vstack([e.all_state for e in self.memory if e is not None])
+        actions = np.vstack([e.action for e in self.memory if e is not None])
+        rewards = np.vstack([e.reward for e in self.memory if e is not None])
+        log_probs = np.vstack([e.log_prob for e in self.memory if e is not None])
 
         return (states, all_states, actions, rewards, log_probs)
 
