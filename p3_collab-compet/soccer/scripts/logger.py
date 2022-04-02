@@ -26,6 +26,10 @@ class Logger():
         self.t = 0
         self.tb = tb
 
+        # Output init messages
+        if self.params.verbose:
+            self.params.print_init_messages(self.agent_ns)
+
         # torch.autograd.set_detect_anomaly(True)         
 
 

@@ -129,7 +129,7 @@ class PPO_Agent():
 
         advantages = (rewards_future - values.squeeze(1)).detach()
         advantages_normalized = (advantages - advantages.mean()) / (advantages.std() + 1e-10)
-        advantages_normalized = torch.tensor(advantages_normalized).float().to(self.params.device).detach()
+        # advantages_normalized = torch.tensor(advantages_normalized).float().to(self.params.device).detach()
         # rewards_future = torch.from_numpy(np.array(rewards_future)).to(self.params.device).type(torch.float).detach()
 
         # Sample (traj_length/batch_size) batches of indices (of size=batch_size)
@@ -171,9 +171,9 @@ class PPO_Agent():
             # Perform gradient ascent
             self.optimizer.zero_grad()
             loss.backward()
-            # if self.params.gradient_clip != 0:
-            #     torch.nn.utils.clip_grad_norm_(self.actor_net.parameters(), self.params.gradient_clip)    # ADDED: Gradient Clipping to prevent exploding grad issue
-            #     torch.nn.utils.clip_grad_norm_(self.critic_net.parameters(), self.params.gradient_clip)   # ADDED: Gradient Clipping to prevent exploding grad issue
+            if self.params.gradient_clip != 0:
+                torch.nn.utils.clip_grad_norm_(self.actor_net.parameters(), self.params.gradient_clip)    # ADDED: Gradient Clipping to prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.critic_net.parameters(), self.params.gradient_clip)   # ADDED: Gradient Clipping to prevent exploding grad issue
             self.optimizer.step()
 
             # Post-processing
@@ -181,8 +181,10 @@ class PPO_Agent():
             self.critic_losses.append(critic_loss.item())
             self.entropy_losses.append(entropy_loss.item())
 
-        self.eps *= self.params.eps_decay
-        self.beta *= self.params.beta_decay
+        # self.eps *= self.params.eps_decay
+        # self.beta *= self.params.beta_decay
+        self.eps = max(self.eps * self.params.eps_decay, self.params.eps_min)
+        self.beta = max(self.beta * self.params.beta_decay, self.params.beta_min)
         self.clear_memory_buffer()
 
    
@@ -193,5 +195,4 @@ class PPO_Agent():
             print("actor_net", self.actor_net)
             print("critic_net", self.critic_net)
         
-        self.params.print_init_messages()
         print("\n~~~~~~ TRAINING ~~~~~")

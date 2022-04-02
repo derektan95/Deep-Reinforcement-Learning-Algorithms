@@ -27,8 +27,10 @@ class Params():
         self.gamma = 0.995                       # discount factor
         self.eps = 0.1                           # How much to clip advantage function
         self.eps_decay = 1                       # How fast to tighten the clipping function
+        self.eps_min = 0.1                       # Min eps to decay to 
         self.beta = 0.001                        # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
         self.beta_decay = 0.995                  # How fast to reduce added entropy (Exploitation Rate)
+        self.beta_min = 0.00005                  # Min beta to decay to
         self.weight_decay = 0                    # L2 weight decay          (ORIGINAL: 0)
         self.n_step_bootstrap = 1                # N-Step bootstrapping for Temporal Difference Update Calculations
         self.gradient_clip = int(0)              # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
@@ -46,10 +48,10 @@ class Params():
 
 
     # If wanna print all local vars in class, consider 'pprint(vars(self))'
-    def print_init_messages(self):
+    def print_init_messages(self, agent_ns=""):
         
         # Print Hyper-parameters
-        print("\n=============== HYPERPARAMS ===============")
+        print(f"\n============ {agent_ns} HYPERPARAMS ============")
         print("DEVICE: ", self.device)
         print("RANDOM SEED: ", self.random_seed)
         print("BATCH_SIZE: ", self.batch_size)
@@ -59,8 +61,10 @@ class Params():
         print("GAMMA: ", self.gamma)
         print("BETA: ", self.beta)
         print("BETA_DECAY: ", self.beta_decay)
+        print("BETA_MIN: ", self.beta_min)
         print("EPS: ", self.eps)
         print("EPS_DECAY: ", self.eps_decay)
+        print("EPS_MIN: ", self.eps_min)
         print("WEIGHT_DECAY: ", self.weight_decay)
         print("===========================================\n")
 
