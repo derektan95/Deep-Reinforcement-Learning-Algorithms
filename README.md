@@ -1,4 +1,4 @@
-# Deep Reinforcement Learning Nanodegree (Udacity)
+# Deep Reinforcement Learning Algorithms
 
 **Disclaimer:** Udacity provided some starter code, but the implementation for these concepts are done by myself. Please contact derektan95@hotmail.com for any questions. <br><br>
 **Note:** Please refer to the instructions on how to download the dependencies for these projects [here](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/INSTRUCTIONS.md).
@@ -35,6 +35,12 @@ This project focuses on the use of **Deep Deterministic Policy Gradient (DDPG)**
 <p align="center">
   <img src="p2_continuous-control/media/p2_ddpg_continuous_control_trained_agent_raw_Trimmed.gif" width="350" height="250" />
   <img src="p2_continuous-control/media/ddpg_reward_episode_graph.png" width="400" height="250" />
+</p>
+
+In addition, the **Distributed Distributional Deterministic Policy Gradients ([D4PG](https://arxiv.org/pdf/1804.08617.pdf))** method was introduced into a multi-arm simulation environment. D4PG utilizes distributional value estimation, n-step returns, prioritized experience replay (PER), distributed K-actor exploration for fast and stable learning. Implementation of PER is omitted as the original paper suggests its lack of efficacy in training speed or stability. 
+<p align="center">
+  <img src="p2_continuous-control/media/D4PG_MultiArm_ContinuousControl.gif" width="350" height="250" />
+  <img src="p2_continuous-control/media/D4PG_MultiArm_ContinuousControl_learning_curve_resized.png" width="325" height="250" />
 </p>
 
 ## Multi-Agent Deep Deterministic Policy Gradient for Cooperative Tennis <br/>
