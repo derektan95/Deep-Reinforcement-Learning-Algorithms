@@ -109,20 +109,25 @@ class Logger():
         print("=====", self.agent_ns, "=====")
         _, axs = plt.subplots(1, 3, figsize=(20, 5))
 
-        # Scores
-        axs[0].plot(np.arange(1, len(self.scores_list)+1), self.scores_list)
-        axs[0].set(xlabel='Episode #', ylabel='Score')
-        axs[0].set_title(f'{self.agent_ns}/Rewards')
+        # # Scores
+        # axs[0].plot(np.arange(1, len(self.scores_list)+1), self.scores_list)
+        # axs[0].set(xlabel='Episode #', ylabel='Score')
+        # axs[0].set_title(f'{self.agent_ns}/Rewards')
         
         # Actor Loss
-        axs[1].plot(np.arange(1, len(self.actor_loss_list)+1), self.actor_loss_list)
-        axs[1].set(xlabel='Episode #', ylabel='Loss')
-        axs[1].set_title(f'{self.agent_ns}/Actor Loss')
+        axs[0].plot(np.arange(1, len(self.actor_loss_list)+1), self.actor_loss_list)
+        axs[0].set(xlabel='Episode #', ylabel='Loss')
+        axs[0].set_title(f'{self.agent_ns}/Actor Loss')
     
         # Critic Loss
-        axs[2].plot(np.arange(1, len(self.critic_loss_list)+1), self.critic_loss_list)
+        axs[1].plot(np.arange(1, len(self.critic_loss_list)+1), self.critic_loss_list)
+        axs[1].set(xlabel='Episode #', ylabel='Loss')
+        axs[1].set_title(f'{self.agent_ns}/Critic Loss')
+
+        # Entropy Loss
+        axs[2].plot(np.arange(1, len(self.entropy_loss_list)+1), self.entropy_loss_list)
         axs[2].set(xlabel='Episode #', ylabel='Loss')
-        axs[2].set_title(f'{self.agent_ns}/Critic Loss')
+        axs[2].set_title(f'{self.agent_ns}/Entropy Loss')
         plt.show()
 
     def clear_weights(self):

@@ -35,16 +35,18 @@ class Params():
         self.n_step_bootstrap = 1                # N-Step bootstrapping for Temporal Difference Update Calculations
         self.gradient_clip = int(0)              # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
         self.optimizer_eps = 1e-8                # Optimizer epsilon: Term added to denominator for numerical stability
+        self.use_gae = False                     # Whether to use Generalized Advantage Estimation to compute advantage
+        self.gae_tau = 0.99                      # GAE's expotential weight discount factor
 
         # Misc
         self.checkpoint_actor_weights_dir = 'weights/checkpoint_actor'
         self.checkpoint_critic_weights_dir = 'weights/checkpoint_critic'
         self.restart_training = True
 
-        # # Restart training params (if restart training is false)
-        # self.eps_to_resume_from = 257
-        # self.actor_weights_filename_to_resume = 'checkpoint_actor_ep257.pth'
-        # self.critic_weights_filename_to_resume = 'checkpoint_critic_ep257.pth'
+        # Restart training params (if restart training is false)
+        self.eps_to_resume_from = 257
+        self.actor_weights_filename_to_resume = 'checkpoint_actor_ep257.pth'
+        self.critic_weights_filename_to_resume = 'checkpoint_critic_ep257.pth'
 
 
     # If wanna print all local vars in class, consider 'pprint(vars(self))'
@@ -66,6 +68,9 @@ class Params():
         print("EPS_DECAY: ", self.eps_decay)
         print("EPS_MIN: ", self.eps_min)
         print("WEIGHT_DECAY: ", self.weight_decay)
+        print("USE GAE: ", self.use_gae)
+        if self.use_gae:
+            print("GAE TAU: ", self.gae_tau)
         print("===========================================\n")
 
 

@@ -13,39 +13,7 @@ from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 
 class PPO_Agent():
     """
-    PyTorch Implementation of Proximal Policy Optimization (PPO) with A3C Value Estimation:
-
-    The actor receives his own state space and outputs an action, the log probability of that action 
-    (to be used later in calculating the advantage ratio) and the entropy of the probability distribution. 
-    Higher entropy indicates more uncertainty in the probabilities. For example, when the probability of the 
-    goalie choosing 1 of the 4 possible actions is roughly equal (25% each), this would be maximum entropy. 
-    When one of those actions has 100% probability and the other 3 actions have 0% probability, the agent is absolutely 
-    certain and entropy will be zero. 
-
-    We use entropy as noise in the loss function to force the agent to try more random actions early on and not get fixated 
-    on a solution which is not optimal in the long run (stuck in a local minima.). Since we are performing gradient descent on 
-    the negative of entropy, we are maximizing it. However, the decaying beta value will continuously shrink the contribution 
-    of entropy in the loss function, leading to more optimization to minimize policy and value loss. Hence, we will notice a 
-    dip in entropy with entropy with time as the agent's policy and critic nets becomes increasingly confident of their predictions.
-
-    The critic receives the combined state space of all 4 agents on the field and outputs the expected average value 
-    (total reward) for an action taken given that state. It learns in a supervised learning fashion by optimizing the MSE loss
-    between future cumulative reward vs state-value estimation. State-value estimates converges with sufficient exploration. 
-
-    The advantage function is used in computing policy loss to indicate how much better an agent is performing relative to a baseline. 
-    This baseline is the state-value prediction from the critic network on how much rewards an agent ought to receive given a state. 
-    Hence, as an agent improves (make better actions and more accurately predict value of states), it is forced to make even better
-    actions that yield higher rewards than what is thought to be the 'averaged' reward for being in that particular state. In simple 
-    terms, an R=+30 may be good at the start, but not as desirable in later training phases.
-
-    A note on the distributions function:
-    It is not possible to have the actor simply output a softmax distribution of action probabilities and then choose an action 
-    off a random sampling of those probabilities. Neural networks cannot directly backpropagate through random samples. 
-    PyTorch and Tensorflow offer a distribution function to solve this that makes the action selection differentiable. 
-    The actor passes the softmax output through this distribution function to select the action and then backpropagation can occur.
-    https://pytorch.org/docs/stable/distributions.html
-
-    - Adapted from Paul Hrabal
+    PyTorch Implementation of Proximal Policy Optimization (PPO) with A3C/GAE Value Estimation:
     """
     
     def __init__(self, state_size, total_state_size, action_size, params=Params()):
@@ -83,12 +51,15 @@ class PPO_Agent():
     def clear_memory_buffer(self):
         self.memory.clear()
 
-    def step(self, states, all_states, actions, rewards, log_probs):
+    def add_last_all_state(self, last_all_state):
+        self.memory.add_last_all_state(last_all_state)
+    
+    def step(self, states, all_states, actions, rewards, log_probs, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         
         # Save experience 
         #log_probs = log_probs.cpu().numpy()
-        self.memory.add(states, all_states, actions, rewards, log_probs)
+        self.memory.add(states, all_states, actions, rewards, log_probs, done)
 
 
     def act(self, state, add_noise=True):
@@ -108,26 +79,48 @@ class PPO_Agent():
         """
         PPO-A3C Learning.
         """
-        states, all_states, actions, rewards, log_probs = self.memory.sample()
-
-        discount = self.params.gamma**np.arange(len(rewards))
-        rewards = rewards.squeeze(1) * discount
-        rewards_future = rewards[::-1].cumsum(axis=0)[::-1]
+        states, all_states, actions, rewards, log_probs, dones = self.memory.sample()
     
+        if self.params.use_gae:
+            last_all_state = np.expand_dims(self.memory.retrieve_last_all_state(), axis=0)
+            all_states = np.append(all_states, last_all_state, axis=0)
+
         states = torch.from_numpy(states).float().to(self.params.device)
         all_states = torch.from_numpy(all_states).float().to(self.params.device)
         actions = torch.from_numpy(actions).long().to(self.params.device).squeeze(1)
         log_probs = torch.from_numpy(log_probs).float().to(self.params.device).squeeze(1)
-        rewards_future = torch.from_numpy(rewards_future.copy()).float().to(self.params.device)
-
 
         # normalize advantage function
         self.critic_net.eval()
         with torch.no_grad():
-            values = self.critic_net(all_states).detach()
+            values = self.critic_net(all_states).squeeze(1).detach()
         self.critic_net.train()
 
-        advantages = (rewards_future - values.squeeze(1)).detach()
+        if self.params.use_gae:
+            advantages = []
+            rewards_future = []
+            values = values.cpu().numpy()
+            returns = values[-1]
+            advantage = 0
+            for i in reversed(range(len(states))):
+                td_err = rewards[i] + self.params.gamma * (1-dones[i]) * values[i+1] - values[i]
+                advantage = advantage * self.params.gae_tau * self.params.gamma * (1-dones[i]) + td_err
+                advantages.append(float(advantage))
+                returns = rewards[i] + self.params.gamma * (1-dones[i]) * returns
+                rewards_future.append(float(returns))
+            
+            advantages = advantages[::-1]            # Flip order
+            rewards_future = rewards_future[::-1]    # Flip order
+            advantages = torch.tensor(advantages.copy()).float().to(self.params.device).detach()
+            rewards_future = torch.tensor(rewards_future.copy()).float().to(self.params.device).detach()
+        
+        else:
+            discount = self.params.gamma**np.arange(len(rewards))
+            rewards = rewards.squeeze(1) * discount
+            rewards_future = rewards[::-1].cumsum(axis=0)[::-1]
+            rewards_future = torch.from_numpy(rewards_future.copy()).float().to(self.params.device)
+            advantages = (rewards_future - values).detach()
+        
         advantages_normalized = (advantages - advantages.mean()) / (advantages.std() + 1e-10)
         # advantages_normalized = torch.tensor(advantages_normalized).float().to(self.params.device).detach()
         # rewards_future = torch.from_numpy(np.array(rewards_future)).to(self.params.device).type(torch.float).detach()
