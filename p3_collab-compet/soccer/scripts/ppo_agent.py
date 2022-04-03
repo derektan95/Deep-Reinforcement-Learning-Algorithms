@@ -114,6 +114,8 @@ class PPO_Agent():
             advantages = torch.tensor(advantages.copy()).float().to(self.params.device).detach()
             rewards_future = torch.tensor(rewards_future.copy()).float().to(self.params.device).detach()
         
+        # Instead of using Monte Carlo estimates for rewards_future, can consider abovementioned bootstrap method instead (see rewards_future)
+        # NOTE: We can don't consider (dones-1) here because this env terminates episode whenever done = true
         else:
             discount = self.params.gamma**np.arange(len(rewards))
             rewards = rewards.squeeze(1) * discount
@@ -122,8 +124,6 @@ class PPO_Agent():
             advantages = (rewards_future - values).detach()
         
         advantages_normalized = (advantages - advantages.mean()) / (advantages.std() + 1e-10)
-        # advantages_normalized = torch.tensor(advantages_normalized).float().to(self.params.device).detach()
-        # rewards_future = torch.from_numpy(np.array(rewards_future)).to(self.params.device).type(torch.float).detach()
 
         # Sample (traj_length/batch_size) batches of indices (of size=batch_size)
         # NOTE: These indices sets cover the entire range of indices
