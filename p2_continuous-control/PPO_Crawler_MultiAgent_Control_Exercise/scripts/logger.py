@@ -6,7 +6,8 @@ import shutil
 import os
 from CustomSummaryWriter import CustomSummaryWriter
 from params import Params
-from model import ActorCriticWrapper
+from model import PPO_ActorCritic
+
 
 class Logger():
     """Generic Logger class to store stats for printing & Tensorboard Visualization """
@@ -43,10 +44,13 @@ class Logger():
         else:
             self.clear_weights()
 
-        # Initialize network wrapper for model visualization on TensorBoard
-        wrapper_net = ActorCriticWrapper(state_size, action_size, self.params)
-        self.tb.add_graph(wrapper_net, 
-                          (torch.zeros(state_size).unsqueeze(0).to(self.params.device)))
+        # # Initialize network wrapper for model visualization on TensorBoard
+        # ppo_ac_net = PPO_ActorCritic(state_size, action_size, self.params).to(self.params.device)
+        # ppo_ac_net.eval()
+        # with torch.no_grad():
+        #     self.tb.add_graph(ppo_ac_net, torch.zeros(state_size).unsqueeze(0).to(self.params.device))
+        # ppo_ac_net.train()
+
 
     def log_stats(self, episode, score, actor_loss, critic_loss, entropy_loss):
         """ Log stats onto Tensorboard on every interations """
@@ -139,8 +143,9 @@ class Logger():
         os.makedirs(self.params.checkpoint_critic_weights_dir)
 
     def save_weights(self, episode):
-        torch.save(self.agent.actor_net.state_dict(), "{}/checkpoint_actor_ep{}.pth".format(self.params.checkpoint_actor_weights_dir, episode))
-        torch.save(self.agent.critic_net.state_dict(), "{}/checkpoint_critic_ep{}.pth".format(self.params.checkpoint_critic_weights_dir, episode))
+        #torch.save(self.agent.ppo_ac_net.state_dict(), "{}/checkpoint_ep{}.pth".format(self.params.checkpoint_actor_weights_dir, episode))
+        torch.save(self.agent.ppo_ac_net.actor.state_dict(), "{}/checkpoint_actor_ep{}.pth".format(self.params.checkpoint_actor_weights_dir, episode))
+        torch.save(self.agent.ppo_ac_net.critic.state_dict(), "{}/checkpoint_critic_ep{}.pth".format(self.params.checkpoint_critic_weights_dir, episode))
 
 
 ####################################################

@@ -16,7 +16,7 @@ class PPO_Agent():
     PyTorch Implementation of Proximal Policy Optimization (PPO) with A3C/GAE Value Estimation:
     """
     
-    def __init__(self, state_size, total_state_size, action_size, params=Params()):
+    def __init__(self, state_size, action_size, params=Params()):
         """Initialize an Agent object.
         
         Params
@@ -62,18 +62,36 @@ class PPO_Agent():
         self.memory.add(states, actions, rewards, log_probs, values, dones)
 
 
+    def act_multi_robots(self, states):
+        """Returns actions, log_probs, entropies, values for multiple robots (Stacked)."""
+
+        actions, log_probs, entropies, values = [], [], [], []
+        for state in states:
+            action, log_prob, entropy, value = self.act(state)
+            actions.append(action)
+            log_probs.append(log_prob)
+            entropies.append(entropy)
+            values.append(value)
+        actions = np.stack(actions)
+        log_probs = np.stack(log_probs)  
+        entropies = np.stack(entropies)  
+        values = np.stack(values)
+
+        return actions, log_probs, entropies, values
+
     def act(self, state):
         """Returns actions for given state as per current policy."""
         state = torch.from_numpy(state).float().unsqueeze(0).to(self.device)
         self.ppo_ac_net.eval()
         with torch.no_grad():
-            action, log_prob, entropy, value = self.ppo_ac_net(state, std_scale=0.0)
+            action, log_prob, entropy, value = self.ppo_ac_net(state, std_scale=1e-10)  # stdev cannot = 0
         self.ppo_ac_net.train()
         
-        action = np.clip(action.cpu().detach().numpy().item(), -1, 1)
-        log_prob = log_prob.cpu().detach().numpy().item()  
-        entropy = entropy.cpu().detach().numpy().item()  
-        value = value.cpu().detach().numpy().item()  
+        # Detach everything to ensure no backprop to these old experiences stored
+        action = np.clip(action.cpu().detach().squeeze().numpy(), -1, 1)  
+        log_prob = log_prob.cpu().detach().squeeze().numpy()  
+        entropy = entropy.cpu().detach().squeeze().numpy()  
+        value = value.cpu().detach().squeeze().numpy()  
 
         return action, log_prob, entropy, value
 
@@ -82,39 +100,48 @@ class PPO_Agent():
         PPO-A3C Learning.
         """
         states, actions, rewards, log_probs, values, dones = self.memory.sample()
-    
+
         # Append last value-state fn to values for GAE value computation
         if self.params.use_gae:
-            last_state = np.expand_dims(self.memory.retrieve_last_state(), axis=0)
-            _, _, _, value = self.ppo_ac_net(last_state)
-            values = np.append(values, value, axis=0)
+            _, _, _, last_values = self.act_multi_robots(self.memory.retrieve_last_state())
+            last_values = np.expand_dims(last_values, axis=0)
+            values = np.concatenate((values, last_values), axis=0)
 
+        # Convert to Pytorch Tensors
         states = torch.from_numpy(states).float().to(self.params.device)
         actions = torch.from_numpy(actions).long().to(self.params.device).squeeze(1)
         log_probs = torch.from_numpy(log_probs).float().to(self.params.device).squeeze(1)
         values = torch.from_numpy(values).float().to(self.params.device)
 
-        # if self.params.use_gae:
+        # Compute advantage for all robots
         advantages = []
         rewards_future = []
         values = values.cpu().numpy()
-        returns = values[-1]
+        returns = values[-1]   #(N, )
         advantage = 0
-        for i in reversed(range(len(states))):
+        for i in reversed(range(len(states))):  #(E, )
             returns = rewards[i] + self.params.gamma * (1-dones[i]) * returns
             if self.params.use_gae:
                 td_err = rewards[i] + self.params.gamma * (1-dones[i]) * values[i+1] - values[i]
                 advantage = advantage * self.params.gae_tau * self.params.gamma * (1-dones[i]) + td_err
             else:
                 advantage = returns - values[i]
-            advantages.append(float(advantage))
-            rewards_future.append(float(returns))
-        
-        advantages = advantages[::-1]            # Flip order
-        rewards_future = rewards_future[::-1]    # Flip order
+            advantages.append(advantage)
+            rewards_future.append(returns)
+
+        advantages = np.stack(advantages[::-1])            # Flip order (E, N)
+        rewards_future = np.stack(rewards_future[::-1])    # Flip order (E, N)
         rewards_future = torch.tensor(rewards_future.copy()).float().to(self.params.device).detach()
         advantages = torch.tensor(advantages.copy()).float().to(self.params.device).detach()
         advantages_normalized = (advantages - advantages.mean()) / (advantages.std() + 1e-10)
+
+        # Flatten all components of experience into (E*N, xxx)
+        num_exp = states.shape[0] * states.shape[1]
+        states = states.view(num_exp, -1)                               # (N*E, S=129)
+        actions = actions.view(num_exp, -1)                             # (N*E, A=20)
+        log_probs = log_probs.view(num_exp, -1)                         # (N*E, A=20)
+        rewards_future = rewards_future.view(num_exp, -1)               # (N*E, R=1)
+        advantages_normalized = advantages_normalized.view(num_exp, -1) # (N*E, Ad=1)
 
         # Sample (traj_length/batch_size) batches of indices (of size=batch_size)
         # NOTE: These indices sets cover the entire range of indices
@@ -126,7 +153,7 @@ class PPO_Agent():
         for batch_idx in batches:
             
             # Filter out sampled data
-            batch_idx = torch.tensor(batch_idx).long().to(self.params.device)       # ADDED
+            #batch_idx = torch.tensor(batch_idx)       # ADDED
             sampled_states = states[batch_idx]
             sampled_actions = actions[batch_idx]
             sampled_rewards = rewards_future[batch_idx]
@@ -134,17 +161,17 @@ class PPO_Agent():
             sampled_advantages = advantages_normalized[batch_idx]
 
             # Policy Loss (PPO)
-            _, cur_log_probs, entropies, values = self.ppo_ac_net(sampled_states, action=sampled_actions, std_scale=self.std_scale)
+            _, cur_log_probs, cur_ent, cur_values = self.ppo_ac_net(sampled_states, action=sampled_actions, std_scale=self.std_scale)
             ppo_ratio = (cur_log_probs - sampled_log_probs).exp()
             clip = torch.clamp(ppo_ratio, 1 - self.eps,  1 + self.eps)
             policy_loss = torch.min(ppo_ratio * sampled_advantages, clip * sampled_advantages)
             policy_loss = -torch.mean(policy_loss)
 
             # Critic Loss (MSE)
-            critic_loss = F.mse_loss(sampled_rewards, values.squeeze(1))
+            critic_loss = F.mse_loss(sampled_rewards.squeeze(1), cur_values.squeeze(1))
 
             # Entropy Loss
-            entropy_loss = -torch.mean(entropies) * self.beta
+            entropy_loss = -torch.mean(cur_ent) * self.beta
 
             # Compute Overall Loss 
             # NOTE: Maximize entropy to encourage exploration (beta to decay exploration with time)
@@ -154,7 +181,7 @@ class PPO_Agent():
             self.optimizer.zero_grad()
             loss.backward()
             if self.params.gradient_clip != 0:
-                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.parameters(), self.params.gradient_clip)    # ADDED: Gradient Clipping to prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
             self.optimizer.step()
 
             # Post-processing

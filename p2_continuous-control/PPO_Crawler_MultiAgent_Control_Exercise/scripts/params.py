@@ -6,40 +6,39 @@ class Params():
     def __init__(self):
 
         # Simulation Based Params
-        self.random_seed = 1                     # Random seed to start sim on
-        self.n_episodes = 2000                   # Number of episodes to run sim for
-        self.max_t = 30000                       # Max sim step before episode terminates (TODO: ADJUST!)
-        self.print_every = 20                    # Prints every x episodes
-        self.save_every = 20                     # Saves weights every x episodes
-        self.log_weights_every = 100             # How often to log weights in Tensorboard
-        self.plot_stats = True                   # Plot graphs from loggers?
-        self.terminate_on_target_score = True    # Terminates simulation upon reaching target score
-        self.target_score = 3000.0               # Target score to achieve before sim termination 
-        self.verbose = True                      # Whether to print debug messages
+        self.random_seed = 1                        # Random seed to start sim on
+        self.n_episodes = 2000                      # Number of episodes to run sim for
+        self.max_t = 1000                           # Max sim step before episode terminates (Max for thie env = 1000)
+        self.print_every = 20                       # Prints every x episodes
+        self.save_every = 20                        # Saves weights every x episodes
+        self.log_weights_every = 100                # How often to log weights in Tensorboard
+        self.plot_stats = True                      # Plot graphs from loggers?
+        self.terminate_on_target_score = True       # Terminates simulation upon reaching target score
+        self.target_score = 3000.0                  # Target score to achieve before sim termination 
+        self.verbose = True                         # Whether to print debug messages
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
-        self.num_steps_collect_data = 5120       # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
-        self.batch_size = 1024                   # minibatch size
-        self.hidden_sizes_actor=(512, 64)        # Hidden layer sizes (Actor Net)
-        self.hidden_sizes_critic=(512, 64)       # Hidden layer sizes (Critic Net)
-        self.lr = 1e-4                           # learning rate of the actor 
-        self.gamma = 0.95                        # discount factor
-        self.eps = 0.1                           # How much to clip advantage function
-        self.eps_decay = 0.995                   # How fast to tighten the clipping function
-        self.eps_min = 0.0                       # Min eps to decay to 
-        self.beta = 0.01                         # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
-        self.beta_decay = 0.995                  # How fast to reduce added entropy (Exploitation Rate)
-        self.beta_min = 0.0                      # Min beta to decay to
-        self.std_scale = 1.0                     # Initial value of std scale for action resampling
-        self.std_scale_decay = 1.0               # How fast to decay std_scale value
-        self.std_scale_min = 1.0                 # Min std_scale to decay to
-        self.weight_decay = 1e-4                 # L2 weight decay          (ORIGINAL: 0)
-        self.n_step_bootstrap = 1                # N-Step bootstrapping for Temporal Difference Update Calculations
-        self.gradient_clip = 1.0                 # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
-        self.optimizer_eps = 1e-5                # Optimizer epsilon: Term added to denominator for numerical stability
-        self.use_gae = True                      # Whether to use Generalized Advantage Estimation to compute advantage
-        self.gae_tau = 0.99                      # GAE's expotential weight discount factor
+        self.num_steps_collect_data = 500           # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.batch_size = 1024                      # minibatch size
+        self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
+        self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
+        self.lr = 1e-4                              # learning rate of the actor 
+        self.gamma = 0.95                           # discount factor
+        self.eps = 0.1                              # How much to clip advantage function
+        self.eps_decay = 0.995                      # How fast to tighten the clipping function
+        self.eps_min = 0.0                          # Min eps to decay to 
+        self.beta = 0.01                            # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
+        self.beta_decay = 0.995                     # How fast to reduce added entropy (Exploitation Rate)
+        self.beta_min = 0.0                         # Min beta to decay to
+        self.std_scale = 1.0                        # Initial value of std scale for action resampling
+        self.std_scale_decay = 1.0                  # How fast to decay std_scale value
+        self.std_scale_min = 1.0                    # Min std_scale to decay to
+        self.weight_decay = 1e-4                    # L2 weight decay          (ORIGINAL: 0)
+        self.gradient_clip = 1.0                    # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
+        self.optimizer_eps = 1e-5                   # Optimizer epsilon: Term added to denominator for numerical stability
+        self.use_gae = True                         # Whether to use Generalized Advantage Estimation to compute advantage
+        self.gae_tau = 0.99                         # GAE's expotential weight discount factor
 
         # Misc
         self.checkpoint_actor_weights_dir = 'weights/checkpoint_actor'

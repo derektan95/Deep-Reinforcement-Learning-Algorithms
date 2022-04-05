@@ -41,12 +41,13 @@ class ReplayBuffer:
     def sample(self):
         """Randomly sample a batch of experiences from memory."""
 
-        states = np.vstack([e.state for e in self.memory if e is not None])
-        actions = np.vstack([e.action for e in self.memory if e is not None])
-        rewards = np.vstack([e.reward for e in self.memory if e is not None])
-        log_probs = np.vstack([e.log_prob for e in self.memory if e is not None])
-        values = np.vstack([e.value for e in self.memory if e is not None])
-        dones = np.vstack([e.done for e in self.memory if e is not None])
+        # Stack to get (num_exp, num_robot, exp_shape)
+        states = np.stack([e.state for e in self.memory if e is not None])
+        actions = np.stack([e.action for e in self.memory if e is not None])
+        rewards = np.stack([e.reward for e in self.memory if e is not None])
+        log_probs = np.stack([e.log_prob for e in self.memory if e is not None])
+        values = np.stack([e.value for e in self.memory if e is not None])
+        dones = np.stack([e.done for e in self.memory if e is not None])        
 
         return (states, actions, rewards, log_probs, values, dones)
 
