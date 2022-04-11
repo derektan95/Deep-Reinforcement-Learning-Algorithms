@@ -23,7 +23,7 @@ class Params():
         self.batch_size = 1024                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
-        self.lr = 1e-4                              # learning rate of the actor 
+        self.lr = 1e-4                              # learning rate of the network 
         self.gamma = 0.95                           # discount factor
         self.eps = 0.1                              # How much to clip advantage function
         self.eps_decay = 0.995                      # How fast to tighten the clipping function
@@ -35,7 +35,7 @@ class Params():
         self.std_scale_decay = 1.0                  # How fast to decay std_scale value
         self.std_scale_min = 1.0                    # Min std_scale to decay to
         self.weight_decay = 1e-4                    # L2 weight decay          (ORIGINAL: 0)
-        self.gradient_clip = 1.0                    # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
+        self.gradient_clip = 1.0                      # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
         self.optimizer_eps = 1e-5                   # Optimizer epsilon: Term added to denominator for numerical stability
         self.use_gae = True                         # Whether to use Generalized Advantage Estimation to compute advantage
         self.gae_tau = 0.99                         # GAE's expotential weight discount factor
@@ -73,6 +73,8 @@ class Params():
         print("USE GAE: ", self.use_gae)
         if self.use_gae:
             print("GAE TAU: ", self.gae_tau)
+        if self.gradient_clip != 0:
+            print("GRAD_CLIP: ", self.gradient_clip)
         print("===========================================\n")
 
 

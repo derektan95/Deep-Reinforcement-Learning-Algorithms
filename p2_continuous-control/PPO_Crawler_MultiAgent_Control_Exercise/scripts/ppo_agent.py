@@ -61,27 +61,9 @@ class PPO_Agent():
         # Save experience 
         self.memory.add(states, actions, rewards, log_probs, values, dones)
 
-
-    def act_multi_robots(self, states):
-        """Returns actions, log_probs, entropies, values for multiple robots (Stacked)."""
-
-        actions, log_probs, entropies, values = [], [], [], []
-        for state in states:
-            action, log_prob, entropy, value = self.act(state, self.std_scale)
-            actions.append(action)
-            log_probs.append(log_prob)
-            entropies.append(entropy)
-            values.append(value)
-        actions = np.stack(actions)
-        log_probs = np.stack(log_probs)  
-        entropies = np.stack(entropies)  
-        values = np.stack(values)
-
-        return actions, log_probs, entropies, values
-
     def act(self, state, std_scale):
         """Returns actions for given state as per current policy."""
-        state = torch.from_numpy(state).float().unsqueeze(0).to(self.device)
+        state = torch.from_numpy(state).float().to(self.device)
         self.ppo_ac_net.eval()
         with torch.no_grad():
             action, log_prob, entropy, value = self.ppo_ac_net(state, std_scale=std_scale)  # stdev cannot = 0
@@ -103,13 +85,13 @@ class PPO_Agent():
 
         # Append last value-state fn to values for GAE value computation
         if self.params.use_gae:
-            _, _, _, last_values = self.act_multi_robots(self.memory.retrieve_last_state())
+            _, _, _, last_values = self.act(self.memory.retrieve_last_state(), self.std_scale)
             last_values = np.expand_dims(last_values, axis=0)
             values = np.concatenate((values, last_values), axis=0)
 
         # Convert to Pytorch Tensors
         states = torch.from_numpy(states).float().to(self.params.device)
-        actions = torch.from_numpy(actions).long().to(self.params.device).squeeze(1)
+        actions = torch.from_numpy(actions).float().to(self.params.device).squeeze(1)
         log_probs = torch.from_numpy(log_probs).float().to(self.params.device).squeeze(1)
         values = torch.from_numpy(values).float().to(self.params.device)
 
