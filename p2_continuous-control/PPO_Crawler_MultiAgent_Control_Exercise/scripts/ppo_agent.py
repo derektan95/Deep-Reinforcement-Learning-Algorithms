@@ -45,9 +45,9 @@ class PPO_Agent():
         self.eps = self.params.eps
         self.beta = self.params.beta
         self.std_scale = self.params.std_scale
-        self.actor_losses = []
-        self.critic_losses = []
-        self.entropy_losses = []
+        self.actor_loss = 0
+        self.critic_loss = 0
+        self.entropy_loss = 0
 
     def clear_memory_buffer(self):
         self.memory.clear()
@@ -67,7 +67,7 @@ class PPO_Agent():
 
         actions, log_probs, entropies, values = [], [], [], []
         for state in states:
-            action, log_prob, entropy, value = self.act(state)
+            action, log_prob, entropy, value = self.act(state, self.std_scale)
             actions.append(action)
             log_probs.append(log_prob)
             entropies.append(entropy)
@@ -79,12 +79,12 @@ class PPO_Agent():
 
         return actions, log_probs, entropies, values
 
-    def act(self, state):
+    def act(self, state, std_scale):
         """Returns actions for given state as per current policy."""
         state = torch.from_numpy(state).float().unsqueeze(0).to(self.device)
         self.ppo_ac_net.eval()
         with torch.no_grad():
-            action, log_prob, entropy, value = self.ppo_ac_net(state, std_scale=1e-10)  # stdev cannot = 0
+            action, log_prob, entropy, value = self.ppo_ac_net(state, std_scale=std_scale)  # stdev cannot = 0
         self.ppo_ac_net.train()
         
         # Detach everything to ensure no backprop to these old experiences stored
@@ -139,16 +139,16 @@ class PPO_Agent():
         num_exp = states.shape[0] * states.shape[1]
         states = states.view(num_exp, -1)                               # (N*E, S=129)
         actions = actions.view(num_exp, -1)                             # (N*E, A=20)
-        log_probs = log_probs.view(num_exp, -1)                         # (N*E, A=20)
-        rewards_future = rewards_future.view(num_exp, -1)               # (N*E, R=1)
-        advantages_normalized = advantages_normalized.view(num_exp, -1) # (N*E, Ad=1)
+        log_probs = log_probs.view(num_exp)                             # (N*E,)
+        rewards_future = rewards_future.view(num_exp)                   # (N*E,)
+        advantages_normalized = advantages_normalized.view(num_exp)     # (N*E,)
 
         # Sample (traj_length/batch_size) batches of indices (of size=batch_size)
         # NOTE: These indices sets cover the entire range of indices
         batches = BatchSampler( SubsetRandomSampler(range(len(states))), self.params.batch_size, drop_last=False)
-        self.actor_losses.clear()
-        self.critic_losses.clear()
-        self.entropy_losses.clear()
+        actor_losses = []
+        critic_losses = []
+        entropy_losses = []
 
         for batch_idx in batches:
             
@@ -168,7 +168,7 @@ class PPO_Agent():
             policy_loss = -torch.mean(policy_loss)
 
             # Critic Loss (MSE)
-            critic_loss = F.mse_loss(sampled_rewards.squeeze(1), cur_values.squeeze(1))
+            critic_loss = F.mse_loss(sampled_rewards, cur_values.squeeze())
 
             # Entropy Loss
             entropy_loss = -torch.mean(cur_ent) * self.beta
@@ -181,19 +181,23 @@ class PPO_Agent():
             self.optimizer.zero_grad()
             loss.backward()
             if self.params.gradient_clip != 0:
-                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.actor.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.critic.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
             self.optimizer.step()
 
             # Post-processing
-            self.actor_losses.append(policy_loss.item())
-            self.critic_losses.append(critic_loss.item())
-            self.entropy_losses.append(entropy_loss.item())
+            actor_losses.append(policy_loss.item())
+            critic_losses.append(critic_loss.item())
+            entropy_losses.append(entropy_loss.item())
 
         # self.eps *= self.params.eps_decay
         # self.beta *= self.params.beta_decay
         self.eps = max(self.eps * self.params.eps_decay, self.params.eps_min)
         self.beta = max(self.beta * self.params.beta_decay, self.params.beta_min)
         self.std_scale = max(self.beta * self.params.std_scale_decay, self.params.std_scale_min)
+        self.actor_loss = sum(actor_losses) / len(actor_losses)
+        self.critic_loss = sum(critic_losses) / len(critic_losses) 
+        self.entropy_loss = sum(entropy_losses) / len(entropy_losses) 
         self.clear_memory_buffer()
 
    

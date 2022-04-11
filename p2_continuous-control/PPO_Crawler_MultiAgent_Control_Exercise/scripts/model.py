@@ -144,6 +144,7 @@ class PPO_Actor(nn.Module):
 
     def forward(self, s, resampled_action=None, std_scale=1.0):
         """Build a network that maps state -> actions."""
+
         # state, apply batch norm BEFORE activation
         s = self.PReLU(self.fc_1a(self.bn_1a(s))) #linear -> batchnorm -> activation
         s = self.PReLU(self.fc_2a(self.bn_2a(s)))
@@ -164,8 +165,8 @@ class PPO_Actor(nn.Module):
         # # then we have log( p(resampled_action | state) ): batchsize, 1
         # log_prob = dist.log_prob(resampled_action).sum(-1).unsqueeze(-1)
         # entropy = dist.entropy().mean() #entropy for noise
-        log_prob = dist.log_prob(resampled_action)
-        entropy = dist.entropy() #entropy for noise
+        log_prob = dist.log_prob(resampled_action).sum(-1)
+        entropy = dist.entropy().mean(1) #entropy for noise
 
         # final output
         return log_prob, action_mean, resampled_action, entropy
@@ -253,12 +254,12 @@ class PPO_ActorCritic(nn.Module):
 
 
     def forward(self, s, action=None, std_scale=1.0):
-        log_prob, action_mean, resampled_action, entropy = self.actor(s, action,
-                                                                      std_scale)
-        if action is None: action = resampled_action
+        log_prob, _, resampled_action, entropy = self.actor(s, resampled_action=action, std_scale=std_scale)
+        if action is None: 
+            action = resampled_action
         v = self.critic(s, action)
 
-        return action_mean, log_prob, entropy, v
+        return resampled_action, log_prob, entropy, v
 
         # pred = {'log_prob': log_prob, # prob dist based on actions generated, grad true,  (num_agents, 1)
         #         'a': resampled_action, #sampled action based on prob dist torch (num_agents,action_size)
