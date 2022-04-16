@@ -114,8 +114,8 @@ class PPO_Agent():
         advantages = np.stack(advantages[::-1])            # Flip order (E, N)
         rewards_future = np.stack(rewards_future[::-1])    # Flip order (E, N)
         rewards_future = torch.tensor(rewards_future.copy()).float().to(self.params.device).detach()
-        advantages = torch.tensor(advantages.copy()).float().to(self.params.device).detach()
-        advantages_normalized = (advantages - advantages.mean()) / (advantages.std() + 1e-10)
+        advantages_normalized = (advantages - np.nanmean(advantages)) / np.std(advantages)   # +1e-10
+        advantages_normalized = torch.tensor(advantages_normalized.copy()).float().to(self.params.device).detach()
 
         # Flatten all components of experience into (E*N, xxx)
         num_exp = states.shape[0] * states.shape[1]
@@ -163,8 +163,7 @@ class PPO_Agent():
             self.optimizer.zero_grad()
             loss.backward()
             if self.params.gradient_clip != 0:
-                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.actor.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
-                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.critic.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
             self.optimizer.step()
 
             # Post-processing

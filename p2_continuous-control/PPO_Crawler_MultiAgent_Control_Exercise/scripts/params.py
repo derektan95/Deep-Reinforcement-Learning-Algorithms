@@ -19,7 +19,7 @@ class Params():
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
-        self.num_steps_collect_data = 500           # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.num_steps_collect_data = 1000          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
         self.batch_size = 1024                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
@@ -29,7 +29,7 @@ class Params():
         self.eps_decay = 0.995                      # How fast to tighten the clipping function
         self.eps_min = 0.0                          # Min eps to decay to 
         self.beta = 0.01                            # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
-        self.beta_decay = 0.995                     # How fast to reduce added entropy (Exploitation Rate)
+        self.beta_decay = 0.9975                     # How fast to reduce added entropy (Exploitation Rate)
         self.beta_min = 0.0                         # Min beta to decay to
         self.std_scale = 1.0                        # Initial value of std scale for action resampling
         self.std_scale_decay = 1.0                  # How fast to decay std_scale value
