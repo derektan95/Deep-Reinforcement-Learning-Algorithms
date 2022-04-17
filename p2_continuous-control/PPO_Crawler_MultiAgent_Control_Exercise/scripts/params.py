@@ -19,7 +19,8 @@ class Params():
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
-        self.num_steps_collect_data = 500           # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.num_data_collect_per_eps = 512         # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.num_batch_before_learn = 32            # Amount of data (batches) to collect data for before learning
         self.batch_size = 1024                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
@@ -32,8 +33,8 @@ class Params():
         self.beta_decay = 0.995                     # How fast to reduce added entropy (Exploitation Rate)
         self.beta_min = 0.0                         # Min beta to decay to
         self.std_scale = 1.0                        # Initial value of std scale for action resampling
-        self.std_scale_decay = 1.0                  # How fast to decay std_scale value
-        self.std_scale_min = 1.0                    # Min std_scale to decay to
+        self.std_scale_decay = 0.995                # How fast to decay std_scale value
+        self.std_scale_min = 0.0                    # Min std_scale to decay to
         self.weight_decay = 1e-4                    # L2 weight decay          (ORIGINAL: 0)
         self.gradient_clip = 1.0                      # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
         self.optimizer_eps = 1e-5                   # Optimizer epsilon: Term added to denominator for numerical stability
@@ -69,6 +70,9 @@ class Params():
         print("EPS: ", self.eps)
         print("EPS_DECAY: ", self.eps_decay)
         print("EPS_MIN: ", self.eps_min)
+        print("STD_SCALE: ", self.std_scale)
+        print("STD_SCALE_DECAY: ", self.std_scale_decay)
+        print("STD_SCALE_MIN: ", self.std_scale_min)
         print("WEIGHT_DECAY: ", self.weight_decay)
         print("USE GAE: ", self.use_gae)
         if self.use_gae:

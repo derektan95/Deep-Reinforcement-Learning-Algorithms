@@ -13,7 +13,9 @@ from torch.utils.data.sampler import BatchSampler, SubsetRandomSampler
 
 class PPO_Agent():
     """
-    PyTorch Implementation of Proximal Policy Optimization (PPO) with A3C/GAE Value Estimation:
+    PyTorch Implementation of Proximal Policy Optimization (PPO) with A3C/GAE Value Estimation. 
+    NOTE: Training data is collected across multiple episodes to ensure learning stability. 
+          Tested with learning within each episode, but training is always unstable (max +1000 rewards before dipping)
     """
     
     def __init__(self, state_size, action_size, params=Params()):
@@ -49,17 +51,14 @@ class PPO_Agent():
         self.critic_loss = 0
         self.entropy_loss = 0
 
-    def clear_memory_buffer(self):
-        self.memory.clear()
-
     def add_last_state(self, last_state):
         self.memory.add_last_state(last_state)
     
-    def step(self, states, actions, rewards, log_probs, values, dones):
+    def add_temp_memory(self, states, actions, rewards, log_probs, values, dones):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         
         # Save experience 
-        self.memory.add(states, actions, rewards, log_probs, values, dones)
+        self.memory.add_temp_memory(states, actions, rewards, log_probs, values, dones)
 
     def act(self, state, std_scale):
         """Returns actions for given state as per current policy."""
@@ -77,11 +76,13 @@ class PPO_Agent():
 
         return action, log_prob, entropy, value
 
-    def learn(self):
+
+    def compute_and_store_advantages(self):
         """
-        PPO-A3C Learning.
-        """
-        states, actions, rewards, log_probs, values, dones = self.memory.sample()
+        Compute advantages from temp memory, parse and store it into main memory.
+        """        
+        
+        states, actions, rewards, log_probs, values, dones = self.memory.retrieve_temp_memory()
 
         # Append last value-state fn to values for GAE value computation
         if self.params.use_gae:
@@ -89,7 +90,7 @@ class PPO_Agent():
             last_values = np.expand_dims(last_values, axis=0)
             values = np.concatenate((values, last_values), axis=0)
 
-        # Convert to Pytorch Tensors
+        # # Convert to Pytorch Tensors
         states = torch.from_numpy(states).float().to(self.params.device)
         actions = torch.from_numpy(actions).float().to(self.params.device).squeeze(1)
         log_probs = torch.from_numpy(log_probs).float().to(self.params.device).squeeze(1)
@@ -111,19 +112,35 @@ class PPO_Agent():
             advantages.append(advantage)
             rewards_future.append(returns)
 
-        advantages = np.stack(advantages[::-1])            # Flip order (E, N)
-        rewards_future = np.stack(rewards_future[::-1])    # Flip order (E, N)
-        rewards_future = torch.tensor(rewards_future.copy()).float().to(self.params.device).detach()
-        advantages = torch.tensor(advantages.copy()).float().to(self.params.device).detach()
+        advantages = advantages[::-1]            # Flip order (E, N)
+        rewards_future = rewards_future[::-1]    # Flip order (E, N)
+        rewards_future = torch.Tensor(rewards_future.copy()).float().to(self.params.device).detach()
+        advantages = torch.Tensor(advantages.copy()).float().to(self.params.device).detach()
         advantages_normalized = (advantages - advantages.mean()) / (advantages.std() + 1e-10)
 
-        # Flatten all components of experience into (E*N, xxx)
-        num_exp = states.shape[0] * states.shape[1]
-        states = states.view(num_exp, -1)                               # (N*E, S=129)
-        actions = actions.view(num_exp, -1)                             # (N*E, A=20)
-        log_probs = log_probs.view(num_exp)                             # (N*E,)
-        rewards_future = rewards_future.view(num_exp)                   # (N*E,)
-        advantages_normalized = advantages_normalized.view(num_exp)     # (N*E,)
+        # # Flatten all components of experience into (E*N, xxx)
+        # num_exp = states.shape[0] * states.shape[1]
+        # states = states.view(num_exp, -1)                               # (N*E, S=129)
+        # actions = actions.view(num_exp, -1)                             # (N*E, A=20)
+        # log_probs = log_probs.view(num_exp)                             # (N*E,)
+        # rewards_future = rewards_future.view(num_exp)                   # (N*E,)
+        # advantages_normalized = advantages_normalized.view(num_exp)     # (N*E,)    
+
+        # print("STATES (PARSED): ", states[0][0][0])
+
+        # Store advantages calculations into main memory
+        for i in range(states.shape[0]):     # NUM_EXP
+            for n in range(states.shape[1]): # NUM_ROBOTS
+                self.memory.add_memory(states[i][n], actions[i][n], rewards_future[i][n], log_probs[i][n], advantages_normalized[i][n])    
+        self.memory.clear_temp_memory()
+
+    def learn(self):
+        """
+        PPO-A3C Learning.
+        """
+        states, actions, rewards_future, log_probs, advantages_normalized = self.memory.retrieve_memory()
+
+        # print("STATES (FLATTENED): ", states[0][0])
 
         # Sample (traj_length/batch_size) batches of indices (of size=batch_size)
         # NOTE: These indices sets cover the entire range of indices
@@ -144,13 +161,13 @@ class PPO_Agent():
 
             # Policy Loss (PPO)
             _, cur_log_probs, cur_ent, cur_values = self.ppo_ac_net(sampled_states, action=sampled_actions, std_scale=self.std_scale)
-            ppo_ratio = (cur_log_probs - sampled_log_probs).exp()
+            ppo_ratio = (cur_log_probs.squeeze() - sampled_log_probs.squeeze()).exp()
             clip = torch.clamp(ppo_ratio, 1 - self.eps,  1 + self.eps)
             policy_loss = torch.min(ppo_ratio * sampled_advantages, clip * sampled_advantages)
             policy_loss = -torch.mean(policy_loss)
 
             # Critic Loss (MSE)
-            critic_loss = F.mse_loss(sampled_rewards, cur_values.squeeze())
+            critic_loss = F.mse_loss(sampled_rewards.squeeze(), cur_values.squeeze())
 
             # Entropy Loss
             entropy_loss = -torch.mean(cur_ent) * self.beta
@@ -158,6 +175,11 @@ class PPO_Agent():
             # Compute Overall Loss 
             # NOTE: Maximize entropy to encourage exploration (beta to decay exploration with time)
             loss = policy_loss + (0.5 * critic_loss) + entropy_loss 
+
+            # Sanity Check
+            assert(cur_log_probs.requires_grad == True)
+            assert(sampled_advantages.requires_grad == False)
+            assert(cur_values.requires_grad == True)
 
             # Perform gradient ascent
             self.optimizer.zero_grad()
@@ -176,11 +198,11 @@ class PPO_Agent():
         # self.beta *= self.params.beta_decay
         self.eps = max(self.eps * self.params.eps_decay, self.params.eps_min)
         self.beta = max(self.beta * self.params.beta_decay, self.params.beta_min)
-        self.std_scale = max(self.beta * self.params.std_scale_decay, self.params.std_scale_min)
+        self.std_scale = max(self.std_scale * self.params.std_scale_decay, self.params.std_scale_min)
         self.actor_loss = sum(actor_losses) / len(actor_losses)
         self.critic_loss = sum(critic_losses) / len(critic_losses) 
         self.entropy_loss = sum(entropy_losses) / len(entropy_losses) 
-        self.clear_memory_buffer()
+        self.memory.clear_memory()
 
    
     def print_init_messages(self):
