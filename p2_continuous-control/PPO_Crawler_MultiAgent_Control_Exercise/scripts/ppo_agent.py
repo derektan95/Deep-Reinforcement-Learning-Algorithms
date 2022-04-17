@@ -163,7 +163,8 @@ class PPO_Agent():
             self.optimizer.zero_grad()
             loss.backward()
             if self.params.gradient_clip != 0:
-                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.actor.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.critic.parameters(), self.params.gradient_clip)   # To prevent exploding grad issue
             self.optimizer.step()
 
             # Post-processing
@@ -175,7 +176,7 @@ class PPO_Agent():
         # self.beta *= self.params.beta_decay
         self.eps = max(self.eps * self.params.eps_decay, self.params.eps_min)
         self.beta = max(self.beta * self.params.beta_decay, self.params.beta_min)
-        self.std_scale = max(self.beta * self.params.std_scale_decay, self.params.std_scale_min)
+        self.std_scale = max(self.std_scale * self.params.std_scale_decay, self.params.std_scale_min)
         self.actor_loss = sum(actor_losses) / len(actor_losses)
         self.critic_loss = sum(critic_losses) / len(critic_losses) 
         self.entropy_loss = sum(entropy_losses) / len(entropy_losses) 
