@@ -115,8 +115,8 @@ class PPO_Agent():
         advantages = advantages[::-1]            # Flip order (E, N)
         rewards_future = rewards_future[::-1]    # Flip order (E, N)
         rewards_future = torch.Tensor(rewards_future.copy()).float().to(self.params.device).detach()
-        advantages = torch.Tensor(advantages.copy()).float().to(self.params.device).detach()
-        advantages_normalized = (advantages - advantages.mean()) / (advantages.std() + 1e-10)
+        advantages_normalized = (advantages - np.nanmean(advantages)) / np.std(advantages)   # +1e-10
+        advantages_normalized = torch.tensor(advantages_normalized.copy()).float().to(self.params.device).detach()   
 
         # # Flatten all components of experience into (E*N, xxx)
         # num_exp = states.shape[0] * states.shape[1]
@@ -144,30 +144,41 @@ class PPO_Agent():
 
         # Sample (traj_length/batch_size) batches of indices (of size=batch_size)
         # NOTE: These indices sets cover the entire range of indices
-        batches = BatchSampler( SubsetRandomSampler(range(len(states))), self.params.batch_size, drop_last=False)
+        batches = BatchSampler( SubsetRandomSampler(range(len(self.memory))), self.params.batch_size, drop_last=False)
+        # indices = np.arange(len(self.memory))
+        # np.random.shuffle(indices)
+        # indices = [indices[div*self.params.batch_size: (div+1)*self.params.batch_size]
+        #            for div in range(len(indices) // self.params.batch_size + 1)]
+
         actor_losses = []
         critic_losses = []
         entropy_losses = []
 
         for batch_idx in batches:
-            
+        # for batch_idx in indices:
+
+            # print(batch_idx)
+            # if (len(batch_idx) == 0):
+            #     print("Skipping empty arr.")
+            #     continue
+
             # Filter out sampled data
             #batch_idx = torch.tensor(batch_idx)       # ADDED
-            sampled_states = states[batch_idx]
-            sampled_actions = actions[batch_idx]
-            sampled_rewards = rewards_future[batch_idx]
-            sampled_log_probs = log_probs[batch_idx]
-            sampled_advantages = advantages_normalized[batch_idx]
+            sampled_states = states[batch_idx].squeeze()
+            sampled_actions = actions[batch_idx].squeeze()
+            sampled_rewards = rewards_future[batch_idx].squeeze()
+            sampled_log_probs = log_probs[batch_idx].squeeze()
+            sampled_advantages = advantages_normalized[batch_idx].squeeze()
 
             # Policy Loss (PPO)
             _, cur_log_probs, cur_ent, cur_values = self.ppo_ac_net(sampled_states, action=sampled_actions, std_scale=self.std_scale)
-            ppo_ratio = (cur_log_probs.squeeze() - sampled_log_probs.squeeze()).exp()
+            ppo_ratio = (cur_log_probs.squeeze() - sampled_log_probs).exp()
             clip = torch.clamp(ppo_ratio, 1 - self.eps,  1 + self.eps)
             policy_loss = torch.min(ppo_ratio * sampled_advantages, clip * sampled_advantages)
             policy_loss = -torch.mean(policy_loss)
 
             # Critic Loss (MSE)
-            critic_loss = F.mse_loss(sampled_rewards.squeeze(), cur_values.squeeze())
+            critic_loss = F.mse_loss(sampled_rewards, cur_values.squeeze())
 
             # Entropy Loss
             entropy_loss = -torch.mean(cur_ent) * self.beta
@@ -185,8 +196,7 @@ class PPO_Agent():
             self.optimizer.zero_grad()
             loss.backward()
             if self.params.gradient_clip != 0:
-                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.actor.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
-                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.critic.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
+                torch.nn.utils.clip_grad_norm_(self.ppo_ac_net.parameters(), self.params.gradient_clip)    # To prevent exploding grad issue
             self.optimizer.step()
 
             # Post-processing

@@ -158,9 +158,11 @@ class PPO_Actor(nn.Module):
         dist = torch.distributions.Normal(action_mean, F.hardtanh(self.std,
                                                                   min_val=0.05*std_scale,
                                                                   max_val=0.5*std_scale))
+
         # sample from the prob distribution just generated again
         if resampled_action is None:
             resampled_action = dist.sample() #num_agent/batch_size x action_size
+
 
         # # then we have log( p(resampled_action | state) ): batchsize, 1
         # log_prob = dist.log_prob(resampled_action).sum(-1).unsqueeze(-1)
@@ -259,7 +261,7 @@ class PPO_ActorCritic(nn.Module):
             action = resampled_action
         v = self.critic(s, action)
 
-        return resampled_action, log_prob, entropy, v
+        return action, log_prob, entropy, v
 
         # pred = {'log_prob': log_prob, # prob dist based on actions generated, grad true,  (num_agents, 1)
         #         'a': resampled_action, #sampled action based on prob dist torch (num_agents,action_size)
