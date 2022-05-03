@@ -27,9 +27,9 @@ class Params():
         self.lr = 1e-4                              # learning rate of the network 
         self.lr_decay = 0.995                       # Decay rate of LR
         self.lr_min = 1e-5                          # Min value for LR
-        self.eps = 0.1                              # How much to clip advantage function
+        self.eps = 0.2                              # How much to clip advantage function
         self.eps_decay = 0.995                      # How fast to tighten the clipping function
-        self.eps_min = 0.0                          # Min eps to decay to 
+        self.eps_min = 0.05                         # Min eps to decay to 
         self.beta = 0.01                            # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
         self.beta_decay = 0.9975                    # How fast to reduce added entropy (Exploitation Rate)
         self.beta_min = 0.0                         # Min beta to decay to
