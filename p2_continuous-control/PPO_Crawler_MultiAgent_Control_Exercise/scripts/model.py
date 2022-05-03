@@ -127,7 +127,7 @@ class PPO_Actor(nn.Module):
         self.fc_4a = nn.Linear(params.hidden_sizes_actor[2], action_size)
 
         # std of the distribution for the resampled action
-        self.std = nn.Parameter(torch.ones(1, action_size)*0.15)
+        self.std = nn.Parameter(torch.ones(1, action_size)*0.3)
 
         self.PReLU = nn.PReLU() # leaky relu
 
@@ -156,7 +156,7 @@ class PPO_Actor(nn.Module):
         # base on the action as mean create a distribution with zero std...
         # dist = torch.distributions.Normal(a_mean, F.softplus(self.std))
         dist = torch.distributions.Normal(action_mean, F.hardtanh(self.std,
-                                                                  min_val=0.05*std_scale,
+                                                                  min_val=0.05,
                                                                   max_val=0.5*std_scale))
         # sample from the prob distribution just generated again
         if resampled_action is None:

@@ -20,9 +20,9 @@ class Logger():
         self.actor_loss_list = []
         self.critic_loss_list = []
         self.entropy_loss_list = []
-        self.scores_deque = deque(maxlen=params.print_every)
-        self.actor_loss_deque = deque(maxlen=params.print_every)
-        self.critic_loss_deque = deque(maxlen=params.print_every)
+        self.scores_deque = deque(maxlen=100)
+        self.actor_loss_deque = deque(maxlen=100)
+        self.critic_loss_deque = deque(maxlen=100)
         self.hparam_dict = params.get_hparam_dict()
         self.t = 0
         self.tb = tb
@@ -51,20 +51,22 @@ class Logger():
         #     self.tb.add_graph(ppo_ac_net, torch.zeros(state_size).unsqueeze(0).to(self.params.device))
         # ppo_ac_net.train()
 
+    def log_score(self, score):
+        self.scores_deque.append(score)
 
-    def log_stats(self, episode, score, actor_loss, critic_loss, entropy_loss):
+    def log_stats(self, episode, actor_loss, critic_loss, entropy_loss):
         """ Log stats onto Tensorboard on every interations """
 
-        self.scores_deque.append(score)
+        #self.scores_deque.append(score)
         self.actor_loss_deque.append(actor_loss)
         self.critic_loss_deque.append(critic_loss)
-        self.scores_list.append(score)
+        self.scores_list.append(np.nanmean(self.scores_deque))
         self.actor_loss_list.append(actor_loss)
         self.critic_loss_list.append(critic_loss)
         self.entropy_loss_list.append(entropy_loss)
 
         # Tensorboard Logging
-        self.tb.add_scalar(f"{self.agent_ns}/Reward", score, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Reward", np.nanmean(self.scores_deque), episode)
         self.tb.add_scalar(f"{self.agent_ns}/Actor Loss", actor_loss, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Critic Loss", critic_loss, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Entropy Loss", entropy_loss, episode)

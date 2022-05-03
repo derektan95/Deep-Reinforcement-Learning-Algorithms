@@ -23,19 +23,22 @@ class Params():
         self.batch_size = 1024                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
-        self.lr = 1e-4                              # learning rate of the network 
         self.gamma = 0.95                           # discount factor
+        self.lr = 1e-4                              # learning rate of the network 
+        self.lr_decay = 0.995                       # Decay rate of LR
+        self.lr_min = 1e-5                          # Min value for LR
         self.eps = 0.1                              # How much to clip advantage function
         self.eps_decay = 0.995                      # How fast to tighten the clipping function
         self.eps_min = 0.0                          # Min eps to decay to 
         self.beta = 0.01                            # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
-        self.beta_decay = 0.9975                     # How fast to reduce added entropy (Exploitation Rate)
+        self.beta_decay = 0.9975                    # How fast to reduce added entropy (Exploitation Rate)
         self.beta_min = 0.0                         # Min beta to decay to
         self.std_scale = 1.0                        # Initial value of std scale for action resampling
-        self.std_scale_decay = 0.995                  # How fast to decay std_scale value
+        self.std_scale_decay = 0.995                # How fast to decay std_scale value
         self.std_scale_min = 0.0                    # Min std_scale to decay to
+        self.critic_loss_coeff = 0.5                # Coefficient to multiply critic loss by while computing overall loss
         self.weight_decay = 1e-4                    # L2 weight decay          (ORIGINAL: 0)
-        self.gradient_clip = 1.0                      # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
+        self.gradient_clip = 1.0                    # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
         self.optimizer_eps = 1e-5                   # Optimizer epsilon: Term added to denominator for numerical stability
         self.use_gae = True                         # Whether to use Generalized Advantage Estimation to compute advantage
         self.gae_tau = 0.99                         # GAE's expotential weight discount factor
@@ -61,8 +64,10 @@ class Params():
         print("BATCH_SIZE: ", self.batch_size)
         print("HIDDEN_SIZES (ACTOR): ", self.hidden_sizes_actor)
         print("HIDDEN_SIZES (CRITIC): ", self.hidden_sizes_critic)
-        print("LR (Joint): ", self.lr)
         print("GAMMA: ", self.gamma)
+        print("LR (Joint): ", self.lr)
+        print("LR_DECAY: ", self.lr_decay)
+        print("LR_MIN: ", self.lr_min)
         print("BETA: ", self.beta)
         print("BETA_DECAY: ", self.beta_decay)
         print("BETA_MIN: ", self.beta_min)

@@ -45,6 +45,7 @@ class PPO_Agent():
         self.eps = self.params.eps
         self.beta = self.params.beta
         self.std_scale = self.params.std_scale
+        self.lr = self.params.lr
         self.actor_loss = 0
         self.critic_loss = 0
         self.entropy_loss = 0
@@ -114,7 +115,7 @@ class PPO_Agent():
         advantages = np.stack(advantages[::-1])            # Flip order (E, N)
         rewards_future = np.stack(rewards_future[::-1])    # Flip order (E, N)
         rewards_future = torch.tensor(rewards_future.copy()).float().to(self.params.device).detach()
-        advantages_normalized = (advantages - np.nanmean(advantages)) / np.std(advantages)   # +1e-10
+        advantages_normalized = (advantages - np.nanmean(advantages)) / (np.std(advantages) + 1e-10)  # +1e-10
         advantages_normalized = torch.tensor(advantages_normalized.copy()).float().to(self.params.device).detach()
 
         # Flatten all components of experience into (E*N, xxx)
@@ -150,14 +151,14 @@ class PPO_Agent():
             policy_loss = -torch.mean(policy_loss)
 
             # Critic Loss (MSE)
-            critic_loss = F.mse_loss(sampled_rewards, cur_values.squeeze())
+            critic_loss = F.mse_loss(sampled_rewards, cur_values.squeeze()) * self.params.critic_loss_coeff
 
             # Entropy Loss
             entropy_loss = -torch.mean(cur_ent) * self.beta
 
             # Compute Overall Loss 
             # NOTE: Maximize entropy to encourage exploration (beta to decay exploration with time)
-            loss = policy_loss + (0.5 * critic_loss) + entropy_loss 
+            loss = policy_loss + critic_loss + entropy_loss 
 
             # Perform gradient ascent
             self.optimizer.zero_grad()
@@ -172,11 +173,15 @@ class PPO_Agent():
             critic_losses.append(critic_loss.item())
             entropy_losses.append(entropy_loss.item())
 
-        # self.eps *= self.params.eps_decay
-        # self.beta *= self.params.beta_decay
+        # Decay-able parameters
         self.eps = max(self.eps * self.params.eps_decay, self.params.eps_min)
         self.beta = max(self.beta * self.params.beta_decay, self.params.beta_min)
         self.std_scale = max(self.std_scale * self.params.std_scale_decay, self.params.std_scale_min)
+        self.lr = max(self.lr * self.params.lr_decay, self.params.lr_min)
+        for g in self.optimizer.param_groups:
+            g['lr'] = self.lr
+
+        # Store Stats
         self.actor_loss = sum(actor_losses) / len(actor_losses)
         self.critic_loss = sum(critic_losses) / len(critic_losses) 
         self.entropy_loss = sum(entropy_losses) / len(entropy_losses) 
