@@ -36,12 +36,12 @@ class Params():
         self.std_scale = 1.0                        # Initial value of std scale for action resampling
         self.std_scale_decay = 0.9975               # How fast to decay std_scale value
         self.std_scale_min = 0.0                    # Min std_scale to decay to
-        self.critic_loss_coeff = 0.5                # Coefficient to multiply critic loss by while computing overall loss
+        self.critic_loss_coeff = 0.25                # Coefficient to multiply critic loss by while computing overall loss
         self.weight_decay = 1e-4                    # L2 weight decay          (ORIGINAL: 0)
         self.gradient_clip = 1.0                    # [int(0) to disable] Whether to clip gradient for optimizer to perform backprop
         self.optimizer_eps = 1e-5                   # Optimizer epsilon: Term added to denominator for numerical stability
         self.use_gae = True                         # Whether to use Generalized Advantage Estimation to compute advantage
-        self.gae_tau = 0.99                         # GAE's expotential weight discount factor
+        self.gae_tau = 0.95                         # GAE's expotential weight discount factor
 
         # Misc
         self.checkpoint_actor_weights_dir = 'weights/checkpoint_actor'
