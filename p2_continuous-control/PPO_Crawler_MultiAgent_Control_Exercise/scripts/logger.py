@@ -51,6 +51,12 @@ class Logger():
         #     self.tb.add_graph(ppo_ac_net, torch.zeros(state_size).unsqueeze(0).to(self.params.device))
         # ppo_ac_net.train()
 
+    def log_decaying_hparams(self, episode, lr, eps, beta, std_scale):
+        self.tb.add_scalar(f"{self.agent_ns}/Learning Rate", lr, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Clipping Eps", eps, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Entropy Beta", beta, episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Network Std_Scale", std_scale, episode)
+
     def log_score(self, score):
         self.scores_deque.append(score)
 

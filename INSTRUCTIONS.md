@@ -78,12 +78,12 @@ Anaconda is a distribution of Python that aims to simplify package management an
 	- __Linux__ or __Mac__: 
 	```bash
 	conda create --name drlnd python=3.6
-	source activate drlnd
+	source activate drlnd   # or drlnd_gpu 
 	```
 	- __Windows__: 
 	```bash
 	conda create --name drlnd python=3.6 
-	activate drlnd
+	activate drlnd          # or drlnd_gpu 
 	```
 	
 2. Follow the instructions in [this repository](https://github.com/openai/gym) to perform a minimal install of OpenAI gym.  
@@ -96,7 +96,11 @@ Anaconda is a distribution of Python that aims to simplify package management an
 ```bash
 git clone https://github.com/udacity/deep-reinforcement-learning.git
 cd deep-reinforcement-learning/python
-pip install .  # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
+
+# NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
+# NOTE: This will install the GPU-related dependencies. Please refer to base Udacity repo for CPU version. 
+pip install .  
+pip install tensorflow tensorboard 		# For tensorboard visualization 
 ```
 
 5. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
