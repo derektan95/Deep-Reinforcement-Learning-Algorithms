@@ -31,8 +31,8 @@ class Params():
         self.eps_decay = 0.9975                     # How fast to tighten the clipping function
         self.eps_min = 0.05                         # Min eps to decay to 
         self.beta = 0.01                            # Entropy to add to the loss fn for exploration (High entropy = more equiprobable)
-        self.beta_decay = 0.9975                    # How fast to reduce added entropy (Exploitation Rate)
-        self.beta_min = 0.0                         # Min beta to decay to
+        self.beta_decay = 0.999                     # How fast to reduce added entropy (Exploitation Rate)
+        self.beta_min = 0.001                       # Min beta to decay to
         self.std_scale = 1.0                        # Initial value of std scale for action resampling
         self.std_scale_decay = 0.9975               # How fast to decay std_scale value
         self.std_scale_min = 0.0                    # Min std_scale to decay to
