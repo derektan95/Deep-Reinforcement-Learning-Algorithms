@@ -12,6 +12,9 @@ pandas
 scipy
 ipykernel
 
-# NOTE: You may need to manually install latest pytorch using `pip install torch` to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
-#       Otherwise, if you have CUDA, please refer to `https://pytorch.org/get-started/locally/`. DO NOT install both torch and pytorch, becayse conda views them separately.
+# NOTE: DO NOT install both torch and pytorch, becayse conda views them separately. Instead, run:
+#       pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+
+# ORIGINAL
 #torch==0.4.0   
+

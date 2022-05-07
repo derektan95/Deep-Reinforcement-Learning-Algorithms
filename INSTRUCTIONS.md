@@ -100,6 +100,7 @@ cd deep-reinforcement-learning/python
 # NOTE: You may need to comment out pytorch version 0.4.0 in requirements.txt, and manually install latest pytorch using pip install torch to prevent weird installation errors (Manually installing 0.4.0 may causes jupyter notebook hanging error). 
 # NOTE: This will install the GPU-related dependencies. Please refer to base Udacity repo for CPU version. 
 pip install .  
+pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 pip install tensorflow tensorboard 		# For tensorboard visualization 
 ```
 
