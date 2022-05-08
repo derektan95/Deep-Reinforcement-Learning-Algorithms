@@ -19,7 +19,7 @@ class Params():
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
-        self.num_steps_collect_data = 1000          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.num_steps_collect_data = 2000          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
         self.batch_size = 1024                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
