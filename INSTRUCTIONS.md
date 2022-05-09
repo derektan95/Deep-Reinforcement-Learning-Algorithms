@@ -116,6 +116,13 @@ python -m ipykernel install --user --name drlnd --display-name "drlnd"
 
 ![Kernel][image2]
 
+
+**NOTE:** Alternatively, you may initialize your conda environment from the .yml files if it suits your hardware: 
+```bash
+cd drl_algorithms_collection
+conda env create -f drlnd_gpu_env.yml
+```
+
 ## Want to learn more?
 
 <p align="center">Come learn with us in the <a href="https://www.udacity.com/course/deep-reinforcement-learning-nanodegree--nd893">Deep Reinforcement Learning Nanodegree</a> program at Udacity!</p>

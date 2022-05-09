@@ -24,7 +24,7 @@ class Params():
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
         self.gamma = 0.95                           # discount factor
-        self.lr = 1e-4                              # learning rate of the network 
+        self.lr = 1.5e-4                            # learning rate of the network 
         self.lr_decay = 0.995                       # Decay rate of LR
         self.lr_min = 1e-5                          # Min value for LR
         self.eps = 0.2                              # How much to clip advantage function
