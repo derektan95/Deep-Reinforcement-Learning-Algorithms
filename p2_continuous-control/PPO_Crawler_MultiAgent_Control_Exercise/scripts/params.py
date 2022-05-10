@@ -8,7 +8,7 @@ class Params():
         # Simulation Based Params
         self.random_seed = 1                        # Random seed to start sim on
         self.n_episodes = 2000                      # Number of episodes to run sim for
-        self.max_t = 1000                           # Max sim step before episode terminates (Max for thie env = 1000)
+        self.max_t = 4096                           # Max sim step before episode terminates (Max for thie env = 1000)
         self.print_every = 20                       # Prints every x episodes
         self.save_every = 20                        # Saves weights every x episodes
         self.log_weights_every = 100                # How often to log weights in Tensorboard
@@ -19,12 +19,12 @@ class Params():
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
-        self.num_steps_collect_data = 2000          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
-        self.batch_size = 1024                      # minibatch size
+        self.num_steps_collect_data = 4096          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.batch_size = 2048                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
         self.gamma = 0.95                           # discount factor
-        self.lr = 1.5e-4                            # learning rate of the network 
+        self.lr = 1e-4                            # learning rate of the network 
         self.lr_decay = 0.995                       # Decay rate of LR
         self.lr_min = 1e-5                          # Min value for LR
         self.eps = 0.2                              # How much to clip advantage function
