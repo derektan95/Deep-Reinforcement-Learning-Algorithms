@@ -8,7 +8,7 @@ class Params():
         # Simulation Based Params
         self.random_seed = 1                        # Random seed to start sim on
         self.n_episodes = 2000                      # Number of episodes to run sim for
-        self.max_t = 8192                           # Max sim step before episode terminates (Max for thie env = 1000)
+        self.max_t = 12288                           # Max sim step before episode terminates (Max for thie env = 1000)
         self.print_every = 20                       # Prints every x episodes
         self.save_every = 20                        # Saves weights every x episodes
         self.log_weights_every = 100                # How often to log weights in Tensorboard
@@ -19,7 +19,7 @@ class Params():
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
-        self.num_steps_collect_data = 8192          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.num_steps_collect_data = 12288          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
         self.batch_size = 2048                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
