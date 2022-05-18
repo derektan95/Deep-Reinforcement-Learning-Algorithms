@@ -14,17 +14,17 @@ class Params():
         self.log_weights_every = 100                # How often to log weights in Tensorboard
         self.plot_stats = True                      # Plot graphs from loggers?
         self.terminate_on_target_score = True       # Terminates simulation upon reaching target score
-        self.target_score = 3000.0                  # Target score to achieve before sim termination 
+        self.target_score = 2500.0                  # Target score to achieve before sim termination 
         self.verbose = True                         # Whether to print debug messages
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
         # General Hyper-params
-        self.num_steps_collect_data = 12288          # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
+        self.num_steps_collect_data = 12288         # Number of steps while collecting data in 1 episode (x12 robots = Total experience tuples)
         self.batch_size = 2048                      # minibatch size
         self.hidden_sizes_actor=(1024, 1024, 512)   # Hidden layer sizes (Actor Net)
         self.hidden_sizes_critic=(1024, 1024, 512)  # Hidden layer sizes (Critic Net)
         self.gamma = 0.95                           # discount factor
-        self.lr = 1e-4                            # learning rate of the network 
+        self.lr = 1e-4                              # learning rate of the network 
         self.lr_decay = 0.995                       # Decay rate of LR
         self.lr_min = 1e-5                          # Min value for LR
         self.eps = 0.2                              # How much to clip advantage function

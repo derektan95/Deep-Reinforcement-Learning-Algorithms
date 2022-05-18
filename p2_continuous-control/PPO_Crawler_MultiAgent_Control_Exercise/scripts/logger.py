@@ -66,13 +66,14 @@ class Logger():
         #self.scores_deque.append(score)
         self.actor_loss_deque.append(actor_loss)
         self.critic_loss_deque.append(critic_loss)
-        self.scores_list.append(np.nanmean(self.scores_deque))
+        score = np.nanmean(self.scores_deque) if len(self.scores_deque) > 0 else 0
+        self.scores_list.append(score)
         self.actor_loss_list.append(actor_loss)
         self.critic_loss_list.append(critic_loss)
         self.entropy_loss_list.append(entropy_loss)
 
         # Tensorboard Logging
-        self.tb.add_scalar(f"{self.agent_ns}/Reward", np.nanmean(self.scores_deque), episode)
+        self.tb.add_scalar(f"{self.agent_ns}/Reward", score, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Actor Loss", actor_loss, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Critic Loss", critic_loss, episode)
         self.tb.add_scalar(f"{self.agent_ns}/Entropy Loss", entropy_loss, episode)
@@ -119,28 +120,31 @@ class Logger():
         """ Plots stats recorded """
 
         print("=====", self.agent_ns, "=====")
+        score_arr  = np.array(self.scores_list)
+        #score_arr[score_arr < 0] = 0
         _, axs = plt.subplots(1, 3, figsize=(20, 5))
 
-        # # Scores
-        # axs[0].plot(np.arange(1, len(self.scores_list)+1), self.scores_list)
-        # axs[0].set(xlabel='Episode #', ylabel='Score')
-        # axs[0].set_title(f'{self.agent_ns}/Rewards')
-        
+        # Scores
+        axs[0].plot(np.arange(1, len(self.scores_list)+1), score_arr)
+        axs[0].set(xlabel='Episode #', ylabel='Score')
+        axs[0].set_title('Rewards')
+            
         # Actor Loss
-        axs[0].plot(np.arange(1, len(self.actor_loss_list)+1), self.actor_loss_list)
-        axs[0].set(xlabel='Episode #', ylabel='Loss')
-        axs[0].set_title(f'{self.agent_ns}/Actor Loss')
-    
-        # Critic Loss
-        axs[1].plot(np.arange(1, len(self.critic_loss_list)+1), self.critic_loss_list)
+        axs[1].plot(np.arange(1, len(self.actor_loss_list)+1), self.actor_loss_list)
         axs[1].set(xlabel='Episode #', ylabel='Loss')
-        axs[1].set_title(f'{self.agent_ns}/Critic Loss')
-
-        # Entropy Loss
-        axs[2].plot(np.arange(1, len(self.entropy_loss_list)+1), self.entropy_loss_list)
+        axs[1].set_title('Actor Loss')
+        
+        # Critic Loss
+        axs[2].plot(np.arange(1, len(self.critic_loss_list)+1), self.critic_loss_list)
         axs[2].set(xlabel='Episode #', ylabel='Loss')
-        axs[2].set_title(f'{self.agent_ns}/Entropy Loss')
+        axs[2].set_title('Critic Loss')
         plt.show()
+
+        # # Entropy Loss
+        # axs[2].plot(np.arange(1, len(self.entropy_loss_list)+1), self.entropy_loss_list)
+        # axs[2].set(xlabel='Episode #', ylabel='Loss')
+        # axs[2].set_title(f'{self.agent_ns}/Entropy Loss')
+        # plt.show()
 
     def clear_weights(self):
         if os.path.exists(self.params.checkpoint_actor_weights_dir):
