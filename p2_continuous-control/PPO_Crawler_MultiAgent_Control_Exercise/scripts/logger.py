@@ -39,8 +39,8 @@ class Logger():
 
         self.agent = agent
         if not self.params.restart_training:
-            agent.actor_net.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_actor_weights_dir, self.params.actor_weights_filename_to_resume)))
-            agent.critic_net.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_critic_weights_dir, self.params.critic_weights_filename_to_resume)))
+            agent.ppo_ac_net.actor.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_actor_weights_dir, self.params.actor_weights_filename_to_resume)))
+            agent.ppo_ac_net.critic.load_state_dict(torch.load("{}/{}".format(self.params.checkpoint_critic_weights_dir, self.params.critic_weights_filename_to_resume)))
         else:
             self.clear_weights()
 
