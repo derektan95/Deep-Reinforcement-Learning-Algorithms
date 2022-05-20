@@ -43,6 +43,12 @@ In addition, the **Distributed Distributional Deterministic Policy Gradients ([D
   <img src="p2_continuous-control/media/D4PG_MultiArm_ContinuousControl_learning_curve_resized.png" width="325" height="250" />
 </p>
 
+Finally, the **Proximal Policy Optimization ([PPO](https://arxiv.org/abs/1707.06347))** method was introduced into a multi-crawler simulation environment. This implementation of PPO combines clipped surrogate actor loss, critic loss and entropy loss. There are 12 agents that are learning concurrently in the same environment, where experiences and weights are shared to achieve stable training.
+<p align="center">
+  <img src="p2_continuous-control/media/PPO_MultiCrawler_Execution.gif" width="350" height="250" />
+  <img src="p2_continuous-control/media/PPO_MultiCrawler_learning_curve.png" width="300" height="275" />
+</p>
+
 ## Multi-Agent Deep Deterministic Policy Gradient for Cooperative Tennis <br/>
 
 This project focuses on the use of **Multi-Agent Deep Deterministic Policy Gradient (MADDPG)** to train 2 tennis bats to cooperate with each other in keeping the ball midair for as long as possible. Here are more information on the [training algorithm](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/tree/master/p3_collab-compet) and [project instructions](https://github.com/derektan95/deep-reinforcement-learning-udacity-nanodegree/blob/master/p3_collab-compet/INSTRUCTIONS.md).
