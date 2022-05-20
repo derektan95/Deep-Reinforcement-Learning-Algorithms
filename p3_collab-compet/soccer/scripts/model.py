@@ -58,12 +58,8 @@ class Actor(nn.Module):
         if action is None:
             action = dist.sample()
 
-        print("action.shape", action.shape)
-
         # Squeeze to output (batch_size, 1) instead of (batch_size, batch_size) during training
         log_prob = dist.log_prob(action)  
-
-        print(log_prob)
 
         return action, log_prob, dist.entropy()
 
