@@ -43,7 +43,7 @@ In addition, the **Distributed Distributional Deterministic Policy Gradients ([D
   <img src="p2_continuous-control/media/D4PG_MultiArm_ContinuousControl_learning_curve_resized.png" width="325" height="250" />
 </p>
 
-Finally, the **Proximal Policy Optimization ([PPO](https://arxiv.org/abs/1707.06347))** method was introduced into a multi-crawler simulation environment. This implementation of PPO combines clipped surrogate actor loss, critic loss and entropy loss. There are 12 agents that are learning concurrently in the same environment, where experiences and weights are shared to achieve stable training.
+Finally, the **Proximal Policy Optimization ([PPO](https://arxiv.org/abs/1707.06347))** method was introduced into a multi-crawler simulation environment. This implementation of PPO combines clipped surrogate actor loss, critic loss and entropy loss. Generalized Advantage Estimate ([GAE](https://arxiv.org/abs/1506.02438)) was introduced to stabalize training by balancing bias and variance. There are 12 agents that are learning concurrently in the same environment, where experiences and weights are shared to achieve stable training.
 <p align="center">
   <img src="p2_continuous-control/media/PPO_MultiCrawler_Execution.gif" width="350" height="250" />
   <img src="p2_continuous-control/media/PPO_MultiCrawler_learning_curve.png" width="300" height="275" />
@@ -56,4 +56,11 @@ This project focuses on the use of **Multi-Agent Deep Deterministic Policy Gradi
 <p align="center">
   <img src="p3_collab-compet/media/p3_maddpg_tennis_trained_agent_trimmed.gif" width="350" height="250" />
   <img src="p3_collab-compet/media/training_score_maddpg_self_play.png" width="400" height="250" />
+</p>
+
+Additionally, the **Proximal Policy Optimization ([PPO](https://arxiv.org/abs/1707.06347))** method was introduced into a soccer simulation environment, with each team comprising of a striker and a goalie. This implementation of PPO combines clipped surrogate actor loss, critic loss and entropy loss. Generalized Advantage Estimate ([GAE](https://arxiv.org/abs/1506.02438)) was introduced to stabalize training by balancing bias and variance. By the end of training, both of the agents specialized in their individual roles, leading to 100% wins against opponents taking random actions.
+
+<p align="center">
+  <img src="p3_collab-compet/media/PPO_Soccer_Execution.gif" width="350" height="250" />
+  <img src="p3_collab-compet/media/PPO_Soccer_learning_curve.png" width="400" height="250" />
 </p>
