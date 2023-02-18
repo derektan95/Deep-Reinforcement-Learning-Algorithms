@@ -101,7 +101,8 @@ cd deep-reinforcement-learning/python
 # NOTE: This will install the GPU-related dependencies. Please refer to base Udacity repo for CPU version. 
 pip install .  
 pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
-pip install tensorflow tensorboard 		# For tensorboard visualization 
+pip install tensorboard==2.8.0 		# For tensorboard visualization 
+pip install tensorflow		        # Optional
 ```
 
 5. Create an [IPython kernel](http://ipython.readthedocs.io/en/stable/install/kernel_install.html) for the `drlnd` environment.  
